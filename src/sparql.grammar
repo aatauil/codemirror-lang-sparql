@@ -1,0 +1,766 @@
+@top QueryUnit {
+  Query
+}
+
+@top UpdateUnit {
+  Update
+}
+
+Prologue { 
+  (BaseDecl | PrefixDecl)*
+}
+
+Query {
+  Prologue ( SelectQuery | ConstructQuery | DescribeQuery | AskQuery ) ValuesClause
+}
+
+Update {
+  Prologue ( Update1 ( ';' Update )? )?
+}
+
+Update1 {
+  Load | Clear | Drop | Add | Move | Copy | Create | InsertData | DeleteData | DeleteWhere | Modify
+}
+
+DeleteClause {
+  'DELETE' QuadPattern
+}
+
+InsertClause {
+  'INSERT' QuadPattern
+}
+
+UsingClause {
+  'USING' ( iri | 'NAMED' iri )
+}
+
+QuadData {
+  '{' Quads '}'
+}
+
+QuadPattern {
+  '{' Quads '}'
+}
+
+Quads {
+  TriplesTemplate? ( QuadsNotTriples '.'? TriplesTemplate? )*
+}
+
+QuadsNotTriples {
+  'GRAPH' VarOrIri '{' TriplesTemplate? '}'
+}
+
+
+
+GraphOrDefault {
+  'DEFAULT' | 'GRAPH'? iri
+}
+
+GraphRefAll {
+  GraphRef | 'DEFAULT' | 'NAMED' | 'ALL'
+}
+
+Load {
+  'LOAD' 'SILENT'? iri ( 'INTO' GraphRef )?
+}
+
+Clear {
+  'CLEAR' 'SILENT'? GraphRefAll
+}
+
+Drop {
+  'DROP' 'SILENT'? GraphRefAll
+}
+
+Create {
+  'CREATE' 'SILENT'? GraphRef
+}
+
+Add {
+  'ADD' 'SILENT'? GraphOrDefault 'TO' GraphOrDefault
+}
+
+Move {
+  'MOVE' 'SILENT'? GraphOrDefault 'TO' GraphOrDefault
+}
+
+Copy {
+  'COPY' 'SILENT'? GraphOrDefault 'TO' GraphOrDefault
+}
+
+InsertData {
+  'INSERT DATA' QuadData
+}
+
+DeleteData {
+  'DELETE DATA' QuadData
+}
+
+DeleteWhere {
+  'DELETE WHERE' QuadPattern
+}
+
+Modify {
+  ( 'WITH' iri )? ( DeleteClause InsertClause? | InsertClause ) UsingClause* 'WHERE' GroupGraphPattern
+}
+
+GraphRef {
+  'GRAPH' iri
+}
+
+AskQuery {
+  'ASK' DatasetClause* WhereClause SolutionModifier
+}
+
+DescribeQuery {
+  'DESCRIBE' ( VarOrIri+ | '*' ) DatasetClause* WhereClause? SolutionModifier
+}
+
+ConstructQuery {
+  'CONSTRUCT' ( ConstructTemplate DatasetClause* WhereClause SolutionModifier | DatasetClause* 'WHERE' '{' TriplesTemplate? '}' SolutionModifier )
+}
+
+TriplesTemplate {
+  TriplesSameSubject ( '.' TriplesTemplate? )?
+}
+
+ConstructTemplate {
+  '{' ConstructTriples? '}'
+}
+
+ConstructTriples {
+  TriplesSameSubject ( '.' ConstructTriples? )?
+}
+
+TriplesSameSubject {
+  VarOrTerm PropertyListNotEmpty | TriplesNode PropertyList
+}
+
+PropertyList {
+  PropertyListNotEmpty?
+}
+
+SelectQuery {
+  SelectClause DatasetClause* WhereClause SolutionModifier
+}
+
+SelectClause {
+  'SELECT' ( 'DISTINCT' | 'REDUCED' )? ( ( Var | ( '(' Expression 'AS' Var ')' ) )+ | '*' )
+}
+
+BaseDecl {
+  'BASE' IriRef
+}
+
+PrefixDecl {
+  'PREFIX' Namespace IriRef
+}
+
+Expression {
+  ConditionalOrExpression 
+}
+
+ConditionalOrExpression {
+  ConditionalAndExpression ( '||' ConditionalAndExpression )*
+}
+
+ConditionalAndExpression {
+  ValueLogical ( '&&' ValueLogical )*
+}
+
+ValueLogical {
+  RelationalExpression
+}
+
+RelationalExpression {
+  NumericExpression ( '=' NumericExpression | '!=' NumericExpression | '<' NumericExpression | '>' NumericExpression | '<=' NumericExpression | '>=' NumericExpression | 'IN' ExpressionList | 'NOT' 'IN' ExpressionList )?
+}
+
+NumericExpression {
+  AdditiveExpression
+}
+
+AdditiveExpression {
+  MultiplicativeExpression ( '+' MultiplicativeExpression | '-' MultiplicativeExpression | ( NumericLiteralPositive | NumericLiteralNegative ) ( ( '*' UnaryExpression ) | ( '/' UnaryExpression ) )* )*
+}
+
+MultiplicativeExpression {
+  UnaryExpression ( '*' UnaryExpression | '/' UnaryExpression )*
+}
+
+UnaryExpression {
+    '!' PrimaryExpression
+  | '+' PrimaryExpression
+  | '-' PrimaryExpression
+  | PrimaryExpression
+}
+
+PrimaryExpression {
+  (BrackettedExpression | BuiltInCall | iriOrFunction | RDFLiteral | NumericLiteral | BooleanLiteral | Var)
+}
+
+BrackettedExpression {
+  '(' Expression ')'
+}
+
+BuiltInCall {
+  ( Aggregate
+  | 'STR' '(' Expression ')'
+  | 'LANG' '(' Expression ')'
+  | 'LANGMATCHES' '(' Expression ',' Expression ')'
+  | 'DATATYPE' '(' Expression ')'
+  | 'BOUND' '(' Var ')'
+  | 'IRI' '(' Expression ')'
+  | 'URI' '(' Expression ')'
+  | 'BNODE' ( '(' Expression ')' | NIL )
+  | 'RAND' NIL
+  | 'ABS' '(' Expression ')'
+  | 'CEIL' '(' Expression ')'
+  | 'FLOOR' '(' Expression ')'
+  | 'ROUND' '(' Expression ')'
+  | 'CONCAT' ExpressionList
+  | SubstringExpression
+  | 'STRLEN' '(' Expression ')'
+  | StrReplaceExpression
+  | 'UCASE' '(' Expression ')'
+  | 'LCASE' '(' Expression ')'
+  | 'ENCODE_FOR_URI' '(' Expression ')'
+  | 'CONTAINS' '(' Expression ',' Expression ')'
+  | 'STRSTARTS' '(' Expression ',' Expression ')'
+  | 'STRENDS' '(' Expression ',' Expression ')'
+  | 'STRBEFORE' '(' Expression ',' Expression ')'
+  | 'STRAFTER' '(' Expression ',' Expression ')'
+  | 'YEAR' '(' Expression ')'
+  | 'MONTH' '(' Expression ')'
+  | 'DAY' '(' Expression ')'
+  | 'HOURS' '(' Expression ')'
+  | 'MINUTES' '(' Expression ')'
+  | 'SECONDS' '(' Expression ')'
+  | 'TIMEZONE' '(' Expression ')'
+  | 'TZ' '(' Expression ')'
+  | 'NOW' NIL
+  | 'UUID' NIL
+  | 'STRUUID' NIL
+  | 'MD5' '(' Expression ')'
+  | 'SHA1' '(' Expression ')'
+  | 'SHA256' '(' Expression ')'
+  | 'SHA384' '(' Expression ')'
+  | 'SHA512' '(' Expression ')'
+  | 'COALESCE' ExpressionList
+  | 'IF' '(' Expression ',' Expression ',' Expression ')'
+  | 'STRLANG' '(' Expression ',' Expression ')'
+  | 'STRDT' '(' Expression ',' Expression ')'
+  | 'sameTerm' '(' Expression ',' Expression ')'
+  | 'isIRI' '(' Expression ')'
+  | 'isURI' '(' Expression ')'
+  | 'isBLANK' '(' Expression ')'
+  | 'isLITERAL' '(' Expression ')'
+  | 'isNUMERIC' '(' Expression ')'
+  | RegexExpression
+  | ExistsFunc
+  | NotExistsFunc )
+}
+
+Aggregate {
+  ( 'COUNT' '(' 'DISTINCT'? ( '*' | Expression ) ')'
+  | 'SUM' '(' 'DISTINCT'? Expression ')'
+  | 'MIN' '(' 'DISTINCT'? Expression ')'
+  | 'MAX' '(' 'DISTINCT'? Expression ')'
+  | 'AVG' '(' 'DISTINCT'? Expression ')'
+  | 'SAMPLE' '(' 'DISTINCT'? Expression ')'
+  | 'GROUP_CONCAT' '(' 'DISTINCT'? Expression ( ';' 'SEPARATOR' '=' String )? ')' )
+}
+
+String {
+  stringLiteral1 |
+  stringLiteral2 |
+  stringLiteralLong1 |
+  stringLiteralLong2
+}
+
+ExpressionList {
+  ( NIL | "(" Expression ("," Expression)* ")" )
+}
+
+SubstringExpression {
+  'SUBSTR' '(' Expression ',' Expression ( ',' Expression )? ')'
+}
+
+StrReplaceExpression {
+  'REPLACE' '(' Expression ',' Expression ',' Expression ( ',' Expression )? ')'
+}
+
+RegexExpression {
+  'REGEX' '(' Expression ',' Expression ( ',' Expression )? ')'
+}
+
+ExistsFunc {
+  'EXISTS' GroupGraphPattern
+}
+
+NotExistsFunc {
+  'NOT' 'EXISTS' GroupGraphPattern
+}
+
+GroupGraphPattern {
+  '{' ( SubSelect | GroupGraphPatternSub ) '}'
+}
+
+SubSelect {
+  SelectClause WhereClause SolutionModifier ValuesClause
+}
+
+WhereClause {
+  'WHERE'? GroupGraphPattern
+}
+
+SolutionModifier {
+  GroupClause? HavingClause? OrderClause? LimitOffsetClauses?
+}
+
+GroupClause {
+  'GROUP' 'BY' GroupCondition+
+}
+
+GroupCondition {
+  ( BuiltInCall | FunctionCall | '(' Expression ( 'AS' Var )? ')' | Var )
+}
+
+FunctionCall {
+  iri ArgList
+}
+
+ArgList {
+  ( NIL | '(' 'DISTINCT'? Expression ( ',' Expression )* ')' )
+}
+
+HavingClause {
+  'HAVING' HavingCondition+
+}
+
+HavingCondition {
+  Constraint
+}
+
+OrderClause {
+  'ORDER' 'BY' OrderCondition+
+}
+
+OrderCondition {
+  ( ( 'ASC' | 'DESC' ) BrackettedExpression ) | ( Constraint | Var )
+}
+
+Constraint {
+  ( BrackettedExpression | BuiltInCall | FunctionCall )
+}
+
+LimitOffsetClauses {
+  ( LimitClause OffsetClause? | OffsetClause LimitClause? )
+}
+
+LimitClause {
+  'LIMIT' INTEGER+
+}
+
+OffsetClause {
+  'OFFSET' INTEGER+
+}
+
+ValuesClause {
+  ( 'VALUES' DataBlock )?
+}
+
+DataBlock {
+ ( InlineDataOneVar | InlineDataFull )
+}
+
+InlineDataOneVar {
+  Var '{' DataBlockValue* '}'
+}
+
+InlineDataFull {
+  ( NIL | '(' Var* ')' ) '{' ( '(' DataBlockValue* ')' | NIL )* '}'
+}
+
+DataBlockValue {
+ ( iri | RDFLiteral | NumericLiteral | BooleanLiteral | 'UNDEF' )
+}
+
+RDFLiteral {
+  String ( LANGTAG | ( '^^' iri ) )?
+}
+
+NumericLiteral {
+  ( NumericLiteralUnsigned | NumericLiteralPositive | NumericLiteralNegative )
+}
+
+NumericLiteralUnsigned {
+  ( INTEGER | DECIMAL | DOUBLE )
+}
+
+NumericLiteralPositive {
+  ( INTEGER_POSITIVE | DECIMAL_POSITIVE | DOUBLE_POSITIVE )
+}
+
+NumericLiteralNegative {
+  ( INTEGER_NEGATIVE | DECIMAL_NEGATIVE | DOUBLE_NEGATIVE )
+}
+
+BooleanLiteral {
+  ( 'true' | 'false' )
+}
+
+GroupGraphPatternSub {
+  TriplesBlock? ( GraphPatternNotTriples '.'? TriplesBlock? )*
+}
+
+TriplesBlock {
+  TriplesSameSubjectPath ( '.' TriplesBlock? )?
+}
+
+TriplesSameSubjectPath {
+  ( VarOrTerm PropertyListPathNotEmpty | TriplesNodePath PropertyListPath )
+}
+
+VarOrTerm {
+  ( Var | GraphTerm )
+}
+
+GraphTerm {
+  ( iri | RDFLiteral | NumericLiteral | BooleanLiteral | BlankNode | NIL )
+}
+
+BlankNode {
+  ( BlankNodeLabel | ANON )
+}
+
+BlankNodeLabel {
+  "_:" blankNodeValue?
+}
+
+PropertyListPathNotEmpty {
+  ( VerbPath | VerbSimple ) ObjectListPath ( ';' ( ( VerbPath | VerbSimple ) ObjectList )? )*
+}
+
+VerbPath {
+  Path
+}
+
+Path {
+  PathAlternative
+}
+
+PathAlternative {
+  PathSequence ( '|' PathSequence )*
+}
+
+PathSequence {
+  PathEltOrInverse ( '/' PathEltOrInverse )*
+}
+
+PathElt {
+  PathPrimary PathMod?
+}
+
+PathEltOrInverse {
+  ( PathElt | '^' PathElt )
+}
+
+PathPrimary {
+ ( iri | 'a' | '!' PathNegatedPropertySet | '(' Path ')' )
+}
+
+PathNegatedPropertySet {
+  PathOneInPropertySet | '(' ( PathOneInPropertySet ( '|' PathOneInPropertySet )* )? ')'
+}
+
+PathOneInPropertySet {
+ ( iri | 'a' | '^' ( iri | 'a' ) )
+}
+
+PathMod {
+  ( '?' | '*' | '+' )
+}
+
+VerbSimple {
+  Var
+}
+
+ObjectListPath {
+  ObjectPath ( ',' ObjectPath )*
+}
+
+ObjectPath {
+  GraphNodePath
+}
+
+GraphNodePath {
+  VarOrTerm | TriplesNodePath
+}
+
+TriplesNodePath {
+  CollectionPath | BlankNodePropertyListPath
+}
+
+BlankNodePropertyListPath {
+  '[' PropertyListPathNotEmpty ']'
+}
+
+Collection {
+  '(' GraphNode+ ')'
+}
+
+CollectionPath {
+  '(' GraphNodePath+ ')'
+}
+
+ObjectList {
+  Object ( ',' Object )* 
+}
+
+Object {
+  GraphNode
+}
+
+GraphNode {
+  ( VarOrTerm | TriplesNode )
+}
+
+TriplesNode {
+  ( Collection | BlankNodePropertyList )
+}
+
+BlankNodePropertyList {
+  '[' PropertyListNotEmpty ']'
+}
+
+PropertyListNotEmpty {
+  Verb ObjectList ( ';' ( Verb ObjectList )? )*
+}
+
+Verb {
+  ( VarOrIri | 'a' )
+}
+
+VarOrIri {
+ ( Var | iri )
+}
+
+PropertyListPath {
+  PropertyListPathNotEmpty?
+}
+
+GraphPatternNotTriples {
+	GroupOrUnionGraphPattern | OptionalGraphPattern | MinusGraphPattern | GraphGraphPattern | ServiceGraphPattern | Filter | Bind | InlineData
+}
+
+GroupOrUnionGraphPattern {
+  GroupGraphPattern ( 'UNION' GroupGraphPattern )*
+}
+
+OptionalGraphPattern {
+  'OPTIONAL' GroupGraphPattern
+}
+
+MinusGraphPattern {
+  'MINUS' GroupGraphPattern
+}
+
+GraphGraphPattern {
+  'GRAPH' VarOrIri GroupGraphPattern
+}
+
+ServiceGraphPattern {
+  'SERVICE' 'SILENT'? VarOrIri GroupGraphPattern
+}
+
+Filter {
+  'FILTER' Constraint
+}
+
+Bind {
+  'BIND' '(' Expression 'AS' Var ')'
+}
+
+InlineData {
+  'VALUES' DataBlock
+}
+
+iriOrFunction {
+  iri ArgList?
+}
+
+DatasetClause {
+  'FROM' ( DefaultGraphClause | NamedGraphClause )
+}
+
+DefaultGraphClause {
+  SourceSelector
+}
+
+NamedGraphClause {
+  'NAMED' SourceSelector
+}
+
+SourceSelector {
+  iri
+}
+
+@skip { space | Comment* }
+
+@tokens {
+  space { 
+    @whitespace+ 
+  }
+
+  Comment { 
+    "#" ![\n]* 
+  }
+  
+  IriRef {
+    "<" (![<>"{}|^`\\\x00-\x20])* ">"
+  }
+
+  iri {
+    IriRef | PrefixedName
+  }
+
+  PrefixedName {
+    PnameLn | Namespace
+  }
+
+  PnameLn {
+    Namespace PnLocal
+  }
+
+  Namespace {
+    PnPrefix* ":"
+  }
+
+  PnPrefix {
+    $[a-z]?
+  }
+
+  PN_CHARS_BASE {
+    ($[A-Z] | $[a-z])
+  }
+
+  Var {
+    $[?$] VARNAME
+  }
+
+  VARNAME {
+    ( PN_CHARS_U | $[0-9] ) ( PN_CHARS_U | $[0-9] | $[\u00B7] | $[\u0300-\u036F] | $[\u203F-\u2040] )*
+  }
+
+  PN_CHARS_U {
+    ( PN_CHARS_BASE | '_' )
+  }
+
+  stringLiteral1 {
+  "'" (![\x27\x5C\x0A\x0D] | Echar)* "'"
+  }
+  
+  stringLiteral2 {
+    "\"" (![\x22\x5C\x0A\x0D] | Echar)* "\""
+  }
+  
+  stringLiteralLong1 {
+    "'''" (("'" | "''")? (!['\\] | Echar))* "'''"
+  }
+  
+  stringLiteralLong2 {
+    "\"\"\"" (("\"" | "\"\"")? (!["\\] | Echar))* "\"\"\""
+  }
+
+  Echar {
+    "\\\\" $[tbnrf\\"']
+  }
+
+  NIL {
+    "(" ("\\x20" | "\\x09" | "\\x0D" | "\\x0A")* ")"
+  }
+
+  PnLocal {
+    (PN_CHARS_U | "\\:" | $[0-9] | PLX ) ((PN_CHARS | '.' | ':' | PLX)* (PN_CHARS | ':' | PLX) )?
+  }
+
+  PLX {
+    (PERCENT | PN_LOCAL_ESC)
+  }
+
+  PERCENT {
+    "%" HEX HEX
+  }
+
+  HEX {
+    $[0-9] | $[A-F] | $[a-f]
+  }
+
+  
+  PN_LOCAL_ESC {
+    "\\"
+  }
+
+  PN_CHARS {
+    ( PN_CHARS_U | '-' | $[0-9] | $[\u00B7] | $[\u0300-\u036F] | $[\u203F-\u2040] )
+  }
+
+  @precedence { INTEGER, DECIMAL, DOUBLE, ".", blankNodeValue }
+  @precedence { INTEGER_POSITIVE, DECIMAL_POSITIVE, DOUBLE_POSITIVE, "+" }
+  @precedence { INTEGER_NEGATIVE, DECIMAL_NEGATIVE, DOUBLE_NEGATIVE, "-" }
+  @precedence { iri, "false", "true", "a", blankNodeValue, space }
+  @precedence { Var, "?" }
+
+  INTEGER {
+    @digit+
+  }
+
+  DECIMAL {
+    @digit* "." @digit+
+  }
+
+  DOUBLE {
+    @digit+ "." @digit* EXPONENT | "." (@digit)+ EXPONENT | (@digit)+ EXPONENT
+  }
+
+  INTEGER_POSITIVE {
+    "+" INTEGER
+  }
+
+  DECIMAL_POSITIVE {
+    "+" DECIMAL
+  }
+
+  DOUBLE_POSITIVE {
+    "+" DOUBLE
+  }
+
+  INTEGER_NEGATIVE {
+    "-" INTEGER
+  }
+
+  DECIMAL_NEGATIVE {
+    "-" DECIMAL
+  }
+
+  DOUBLE_NEGATIVE {
+    "-" DOUBLE
+  }
+
+  EXPONENT {
+    $[eE] $[+-]? @digit+
+  }
+
+  LANGTAG {
+    "@" @asciiLetter+ ("-" ( @asciiLowercase | @asciiUppercase | @digit)+)*
+  }
+
+  ANON {
+    "[" ("\\x20" | "\\x09" | "\\x0D" | "\\x0A")* "]"
+  }
+
+  blankNodeValue {
+     $[A-Z] | $[a-z] | $[\u00C0-\u00D6] | $[\u00D8-\u00F6] | $[\u00F8-\u02FF] | $[\u0370-\u037D] | $[\u037F-\u1FFF] | $[\u200C-\u200D] | $[\u2070-\u218F] | $[\u2C00-\u2FEF] | $[\u3001-\uD7FF] | $[\uF900-\uFDCF] | $[\uFDF0-\uFFFD] | "_" | $[0-9]
+  }
+}
