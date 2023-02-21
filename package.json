@@ -1,35 +1,37 @@
 {
-  "name": "lezer-sparql",
-  "version": "0.0.1",
-  "description": "Lezer-based SPARQL grammar",
-  "main": "dist/index.cjs",
-  "type": "module",
-  "exports": {
-    "import": "./dist/index.es.js",
-    "require": "./dist/index.cjs"
+  "name": "codemirror-lang-sparql",
+  "version": "0.1.0",
+  "description": "Sparql language support for CodeMirror",
+  "scripts": {
+    "test": "mocha test/test.js",
+    "prepare": "rollup -c"
   },
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "author": "Achraf Atauil",
   "license": "MIT",
-  "devDependencies": {
-    "@lezer/generator": "^1.2.2",
-    "mocha": "^9.0.1",
-    "rollup": "^2.52.2",
-    "@rollup/plugin-node-resolve": "^9.0.0"
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
   },
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
   "dependencies": {
+    "@codemirror/language": "^6.0.0",
     "@lezer/highlight": "^1.0.0",
-    "@lezer/lr": "^1.1.0"
+    "@lezer/lr": "^1.0.0"
+  },
+  "devDependencies": {
+    "@lezer/generator": "^1.0.0",
+    "mocha": "^9.0.1",
+    "rollup": "^2.60.2",
+    "rollup-plugin-dts": "^4.0.1",
+    "rollup-plugin-ts": "^3.0.2",
+    "typescript": "^4.3.4"
   },
   "repository": {
     "type" : "git",
     "url" : "https://github.com/aatauil/lezer-sparql.git"
-  },
-  "scripts": {
-    "build": "lezer-generator src/sparql.grammar -o src/parser && rollup -c",
-    "build-debug": "lezer-generator src/sparql.grammar --names -o src/parser && rollup -c",
-    "prepare": "npm run build",
-    "test": "mocha test/test-*.js"
   }
 }
