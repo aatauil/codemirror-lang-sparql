@@ -25,6 +25,6 @@ export const SparqlLanguage = LRLanguage.define({
   }
 })
 
-export function Sparql() {
+export function sparql() {
   return new LanguageSupport(SparqlLanguage)
 }
