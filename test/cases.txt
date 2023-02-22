@@ -1,27 +1,57 @@
-# Booleans
-
-#t
-#f
-
-==>
-
-Program(Boolean, Boolean)
-
-# Identifiers
+# Namespace
 
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-==>
-
-Program(Identifier, Identifier)
-
-# Strings
-
 SELECT * WHERE {
-  ?s ?p ?o 
+  ?sub ?pred ?obj .
 } LIMIT 10
 
 ==>
 
-Program(String, String)
+QueryUnit(
+  Query(
+    Prologue(
+      PrefixDecl(
+        Namespace,
+        IriRef
+      )
+    )
+    SelectQuery(
+      SelectClause
+      WhereClause(
+        GroupGraphPattern(
+          GroupGraphPatternSub (
+            TriplesBlock (
+              TriplesSameSubjectPath (
+                VarOrTerm (
+                  Var
+                )
+                PropertyListPathNotEmpty (
+                  VerbSimple (
+                    Var
+                  )
+                  ObjectListPath (
+                    ObjectPath (
+                      GraphNodePath (
+                        VarOrTerm (
+                          Var
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+      SolutionModifier (
+        LimitOffsetClauses (
+          LimitClause (
+            INTEGER
+          )
+        )
+      )
+    )
+    ValuesClause
+  )
+)
