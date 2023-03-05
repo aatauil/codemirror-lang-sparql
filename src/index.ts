@@ -1,5 +1,5 @@
 import { parser } from "./syntax.grammar"
-import { LRLanguage, LanguageSupport } from "@codemirror/language"
+import { LRLanguage, LanguageSupport, foldNodeProp, foldInside } from "@codemirror/language"
 import { styleTags, tags as t } from "@lezer/highlight"
 
 export const SparqlLanguage = LRLanguage.define({
@@ -15,7 +15,11 @@ export const SparqlLanguage = LRLanguage.define({
         "{ }": t.brace,
         Langstag: t.annotation,
         "TRUE FALSE": t.bool
-      })
+      }),
+      foldNodeProp.add({ 
+        GroupGraphPattern: foldInside,
+        Prologue(tree) { return { from: tree.from + 7, to: tree.to - 0} }
+      }),
     ]
   }),
 })
