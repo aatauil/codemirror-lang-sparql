@@ -1,6 +1,6 @@
 # CodeMirror SPARQL Language Support [alpha]
 
-<span><a href="https://www.npmjs.com/package/@replit/codemirror-lang-solidity" title="NPM version badge"><img src="https://img.shields.io/npm/v/codemirror-lang-sparql?color=blue" alt="NPM version badge" /></a></span>
+<span><a href="https://www.npmjs.com/package/codemirror-lang-sparql" title="NPM version badge"><img src="https://img.shields.io/npm/v/codemirror-lang-sparql?color=blue" alt="NPM version badge" /></a></span>
 
 A CodeMirror extension that provides SPARQL syntax highlighting and language support.
 
