@@ -1,22 +1,27 @@
 {
   "name": "codemirror-lang-sparql",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Sparql language support for CodeMirror",
   "scripts": {
-    "test": "mocha test/test.js",
-    "prepare": "rollup -c"
+    "build": "lezer-generator src/syntax.grammar -o src/parser && rollup -c",
+    "build-debug": "lezer-generator src/syntax.grammar --names -o src/parser && rollup -c",
+    "test": "mocha test/test.js"
   },
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
-  "author": "Achraf Atauil",
-  "license": "MIT",
   "exports": {
     "import": "./dist/index.js",
     "require": "./dist/index.cjs"
   },
   "types": "dist/index.d.ts",
   "sideEffects": false,
+  "author": "Achraf Atauil",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aatauil/codemirror-lang-sparql.git"
+  },
   "dependencies": {
     "@codemirror/language": "^6.0.0",
     "@lezer/highlight": "^1.0.0",
@@ -29,9 +34,6 @@
     "rollup-plugin-dts": "^4.0.1",
     "rollup-plugin-ts": "^3.0.2",
     "typescript": "^4.3.4"
-  },
-  "repository": {
-    "type" : "git",
-    "url" : "https://github.com/aatauil/codemirror-lang-sparql.git"
   }
+
 }
