@@ -360,7 +360,7 @@ NumericLiteralNegative {
 }
 
 BooleanLiteral {
-  Boolean
+  ( TRUE | FALSE )
 }
 
 GroupGraphPatternSub {
@@ -783,10 +783,6 @@ UsingClause {
     "[" ("\\x20" | "\\x09" | "\\x0D" | "\\x0A")* "]"
   }
 
-  Boolean {
-    ( TRUE | FALSE )
-  }
-
   @precedence { Iri, "a" , "_:", space, Keyword,  BlankNodeValue }
   @precedence {
     DoublePositive, DecimalPositive, IntegerPositive, Double, Decimal, Integer, "+", ".", BlankNodeValue
@@ -813,3 +809,6 @@ UsingClause {
   REGEX, EXISTS, NOT, IN, GROUP, BY, HAVING, ORDER, ASC, DESC, LIMIT, OFFSET, VALUES, UNDEF,
   UNION, OPTIONAL, MINUS, GRAPH, SERVICE, SILENT, FILTER, BIND, AS, FROM, NAMED, TRUE, FALSE, LOAD, INTO, TO, CLEAR, DROP, CREATE, ADD, MOVE, COPY, INSERT, DATA, DELETE, WITH, DEFAULT, ALL, USING
 }
+
+@external propSource highlight from "./highlight"
+
