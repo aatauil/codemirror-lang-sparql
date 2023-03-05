@@ -7,17 +7,21 @@ SELECT * WHERE {
 
 ==>
 
-QueryUnit(
+Unit(
   Query(
     Prologue(
       PrefixDecl(
+        PREFIX
         Namespace,
         IriRef
       )
     )
     SelectQuery(
-      SelectClause
+      SelectClause (
+        SELECT
+      )
       WhereClause(
+        WHERE
         GroupGraphPattern(
           GroupGraphPatternSub (
             TriplesBlock (
@@ -47,7 +51,8 @@ QueryUnit(
       SolutionModifier (
         LimitOffsetClauses (
           LimitClause (
-            INTEGER
+            LIMIT
+            Integer
           )
         )
       )
