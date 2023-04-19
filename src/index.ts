@@ -14,10 +14,14 @@ export const SparqlLanguage = LRLanguage.define({
         "Double Decimal": t.float,
         "{ }": t.brace,
         Langstag: t.annotation,
-        "TRUE FALSE": t.bool
+        "TRUE FALSE": t.bool,
+				"VerbPath Namespace IriRef": t.namespace,
+				"Iri": t.url,
+				"RDFLiteral/Iri": t.typeName,
       }),
       foldNodeProp.add({ 
         GroupGraphPattern: foldInside,
+        QuadData: foldInside,
         Prologue(tree) { return { from: tree.from + 7, to: tree.to - 0} }
       }),
     ]
