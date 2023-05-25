@@ -5,7 +5,7 @@
 A CodeMirror extension that provides SPARQL syntax highlighting and language support.
 
 ## Note
-This parser is in a usable state but still have big plans for it. Breaking changes can be expected
+This parser is in a usable state but not 100% in line with the spec **yet**
 
 ### Usage
 
