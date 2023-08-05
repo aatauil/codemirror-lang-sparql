@@ -1,11 +1,111 @@
 @detectDelim
 
 @top Unit {
-  ( Query | Update )
+  Query | Update
 }
 
 Query {
   Prologue ( SelectQuery | ConstructQuery | DescribeQuery | AskQuery ) ValuesClause    
+}
+
+Prologue { 
+  ( BaseDecl | PrefixDecl )*
+}
+
+BaseDecl {
+  BASE IriRef
+}
+
+PrefixDecl {
+  PREFIX Pname_ns IriRef
+}
+
+SelectQuery {
+  SelectClause DatasetClause* WhereClause SolutionModifier
+}
+
+SubSelect {
+  SelectClause WhereClause SolutionModifier ValuesClause
+}
+
+SelectClause {
+  SELECT ( DISTINCT | REDUCED )? ( ( Var | ( '(' Expression AS Var ')' ) )+ | '*' )
+}
+
+ConstructQuery {
+  CONSTRUCT ( ConstructTemplate DatasetClause* WhereClause SolutionModifier | DatasetClause* WHERE '{' TriplesTemplate? '}' SolutionModifier )
+}
+
+DescribeQuery {
+  DESCRIBE ( VarOrIri+ | '*' ) DatasetClause* WhereClause? SolutionModifier
+}
+
+AskQuery {
+  ASK DatasetClause* WhereClause SolutionModifier
+}
+
+DatasetClause {
+  FROM ( DefaultGraphClause | NamedGraphClause )
+}
+
+DefaultGraphClause {
+  SourceSelector
+}
+
+NamedGraphClause {
+  NAMED SourceSelector
+}
+
+SourceSelector {
+  Iri
+}
+
+WhereClause {
+  WHERE? GroupGraphPattern
+}
+
+SolutionModifier {
+  GroupClause? HavingClause? OrderClause? LimitOffsetClauses?
+}
+
+GroupClause {
+  GROUP BY GroupCondition+
+}
+
+GroupCondition {
+  BuiltInCall | FunctionCall | '(' Expression ( AS Var )? ')' | Var
+}
+
+HavingClause {
+  HAVING HavingCondition+
+}
+
+HavingCondition {
+  Constraint
+}
+
+OrderClause {
+  ORDER BY OrderCondition+
+}
+
+OrderCondition {
+  ( ( ASC | DESC ) BrackettedExpression ) | ( Constraint | Var )
+}
+
+LimitOffsetClauses {
+  LimitClause OffsetClause? | OffsetClause LimitClause?
+}
+
+LimitClause {
+  LIMIT Integer+
+}
+
+OffsetClause {
+  OFFSET Integer+
+}
+
+ValuesClause {
+  ( VALUES DataBlock )?
 }
 
 Update {
@@ -13,7 +113,7 @@ Update {
 }
 
 Update1 {
- ( Load | Clear | Drop | Add | Move | Copy | Create | InsertData | DeleteData | DeleteWhere | Modify )
+ Load | Clear | Drop | Add | Move | Copy | Create | InsertData | DeleteData | DeleteWhere | Modify
 }
 
 Load {
@@ -60,28 +160,268 @@ Modify {
   ( WITH Iri )? ( DeleteClause InsertClause? | InsertClause ) UsingClause* WHERE GroupGraphPattern
 }
 
+DeleteClause {
+  DELETE QuadPattern
+}
+
+InsertClause {
+  INSERT QuadPattern
+}
+
+UsingClause {
+  USING ( Iri | NAMED Iri )
+}
+
+GraphOrDefault {
+  DEFAULT | GRAPH? Iri
+}
+
 GraphRef {
   GRAPH Iri
 }
 
-Prologue { 
-  (BaseDecl | PrefixDecl)*
+GraphRefAll {
+  GraphRef | DEFAULT | NAMED | ALL
 }
 
-BaseDecl {
-  BASE IriRef
+QuadPattern {
+  '{' Quads '}'
 }
 
-PrefixDecl {
-  PREFIX Namespace IriRef
+QuadData {
+  '{' Quads '}'
 }
 
-SelectQuery {
-  SelectClause DatasetClause* WhereClause SolutionModifier
+Quads {
+  TriplesTemplate? ( QuadsNotTriples '.'? TriplesTemplate? )*
 }
 
-SelectClause {
-  SELECT ( DISTINCT | REDUCED )? ( ( Var | ( '(' Expression AS Var ')' ) )+ | '*' )
+QuadsNotTriples {
+  GRAPH VarOrIri '{' TriplesTemplate? '}'
+}
+
+TriplesTemplate {
+  TriplesSameSubject ( '.' TriplesTemplate? )?
+}
+
+GroupGraphPattern {
+  '{' ( SubSelect | GroupGraphPatternSub ) '}'
+}
+
+GroupGraphPatternSub {
+  TriplesBlock? ( GraphPatternNotTriples '.'? TriplesBlock? )*
+}
+
+TriplesBlock {
+  TriplesSameSubjectPath ( '.' TriplesBlock? )?
+}
+
+GraphPatternNotTriples {
+	GroupOrUnionGraphPattern | OptionalGraphPattern | MinusGraphPattern | GraphGraphPattern | ServiceGraphPattern | Filter | Bind | InlineData
+}
+
+OptionalGraphPattern {
+  OPTIONAL GroupGraphPattern
+}
+
+GraphGraphPattern {
+  GRAPH VarOrIri GroupGraphPattern
+}
+
+ServiceGraphPattern {
+  SERVICE SILENT? VarOrIri GroupGraphPattern
+}
+
+Bind {
+  BIND '(' Expression AS Var ')'
+}
+
+InlineData {
+  VALUES DataBlock
+}
+
+DataBlock {
+  InlineDataOneVar | InlineDataFull
+}
+
+InlineDataOneVar {
+  Var '{' DataBlockValue* '}'
+}
+
+InlineDataFull {
+  ( Nil | '(' Var* ')' ) '{' ( '(' DataBlockValue* ')' | Nil )* '}'
+}
+
+DataBlockValue {
+ Iri | RDFLiteral | NumericLiteral | BooleanLiteral | UNDEF
+}
+
+MinusGraphPattern {
+  MINUS GroupGraphPattern
+}
+
+GroupOrUnionGraphPattern {
+  GroupGraphPattern ( UNION GroupGraphPattern )*
+}
+
+Filter {
+  FILTER Constraint
+}
+
+Constraint {
+  BrackettedExpression | BuiltInCall | FunctionCall
+}
+
+FunctionCall {
+  Iri ArgList
+}
+
+ArgList {
+  Nil | '(' DISTINCT? Expression ( ',' Expression )* ')'
+}
+
+ExpressionList {
+  Nil | "(" Expression ("," Expression)* ")"
+}
+
+ConstructTemplate {
+  '{' ConstructTriples? '}'
+}
+
+ConstructTriples {
+  TriplesSameSubject ( '.' ConstructTriples? )?
+}
+
+TriplesSameSubject {
+  VarOrTerm PropertyListNotEmpty | TriplesNode PropertyList
+}
+
+PropertyList {
+  PropertyListNotEmpty?
+}
+
+PropertyListNotEmpty {
+  Verb ObjectList ( ';' ( Verb ObjectList )? )*
+}
+
+Verb {
+  ( VarOrIri | 'a' )
+}
+
+ObjectList {
+  Object ( ',' Object )* 
+}
+
+Object {
+  GraphNode
+}
+
+TriplesSameSubjectPath {
+  VarOrTerm PropertyListPathNotEmpty | TriplesNodePath PropertyListPath
+}
+
+PropertyListPath {
+  PropertyListPathNotEmpty?
+}
+
+PropertyListPathNotEmpty {
+  ( VerbPath | VerbSimple ) ObjectListPath ( ';' ( ( VerbPath | VerbSimple ) ObjectList )? )*
+}
+
+VerbPath {
+  Path
+}
+
+VerbSimple {
+  Var
+}
+
+ObjectListPath {
+  ObjectPath ( ',' ObjectPath )*
+}
+
+ObjectPath {
+  GraphNodePath
+}
+
+Path {
+  PathAlternative
+}
+
+PathAlternative {
+  PathSequence ( '|' PathSequence )*
+}
+
+PathSequence {
+  PathEltOrInverse ( '/' PathEltOrInverse )*
+}
+
+PathElt {
+  PathPrimary PathMod?
+}
+
+PathEltOrInverse {
+  ( PathElt | '^' PathElt )
+}
+
+PathMod {
+  ( '?' | '*' | '+' )
+}
+
+PathPrimary {
+ ( Iri | 'a' | '!' PathNegatedPropertySet | '(' Path ')' )
+}
+
+PathNegatedPropertySet {
+  ( PathOneInPropertySet | '(' ( PathOneInPropertySet ( '|' PathOneInPropertySet )* )? ')' )
+}
+
+PathOneInPropertySet {
+ ( Iri | 'a' | '^' ( Iri | 'a' ) )
+}
+
+TriplesNode {
+  ( Collection | BlankNodePropertyList )
+}
+
+BlankNodePropertyList {
+  '[' PropertyListNotEmpty ']'
+}
+
+TriplesNodePath {
+  ( CollectionPath | BlankNodePropertyListPath )
+}
+
+BlankNodePropertyListPath {
+  '[' PropertyListPathNotEmpty ']'
+}
+
+Collection {
+  '(' GraphNode+ ')'
+}
+
+CollectionPath {
+  '(' GraphNodePath+ ')'
+}
+
+GraphNode {
+  ( VarOrTerm | TriplesNode )
+}
+
+GraphNodePath {
+  ( VarOrTerm | TriplesNodePath )
+}
+
+VarOrTerm {
+  ( Var | GraphTerm )
+}
+
+VarOrIri {
+ ( Var | Iri )
+}
+
+GraphTerm {
+  ( Iri | RDFLiteral | NumericLiteral | BooleanLiteral | BlankNode | Nil )
 }
 
 Expression {
@@ -144,7 +484,7 @@ PrimaryExpression {
   (
    BrackettedExpression | 
    BuiltInCall | 
-   iriOrFunction | 
+   IriOrFunction | 
    RDFLiteral | 
    NumericLiteral | 
    BooleanLiteral | 
@@ -214,25 +554,8 @@ BuiltInCall {
   | NotExistsFunc )
 }
 
-Aggregate {
-  ( COUNT '(' DISTINCT? ( '*' | Expression ) ')'
-  | SUM '(' DISTINCT? Expression ')'
-  | MIN '(' DISTINCT? Expression ')'
-  | MAX '(' DISTINCT? Expression ')'
-  | AVG '(' DISTINCT? Expression ')'
-  | SAMPLE '(' DISTINCT? Expression ')'
-  | GROUP_CONCAT '(' DISTINCT? Expression ( ';' SEPARATOR '=' String )? ')' )
-}
-
-String {
-  stringLiteral1 |
-  stringLiteral2 |
-  stringLiteralLong1 |
-  stringLiteralLong2
-}
-
-ExpressionList {
-  ( Nil | "(" Expression ("," Expression)* ")" )
+RegexExpression {
+  REGEX '(' Expression ',' Expression ( ',' Expression )? ')'
 }
 
 SubstringExpression {
@@ -243,10 +566,6 @@ StrReplaceExpression {
   REPLACE '(' Expression ',' Expression ',' Expression ( ',' Expression )? ')'
 }
 
-RegexExpression {
-  REGEX '(' Expression ',' Expression ( ',' Expression )? ')'
-}
-
 ExistsFunc {
   EXISTS GroupGraphPattern
 }
@@ -255,92 +574,23 @@ NotExistsFunc {
   NOT EXISTS GroupGraphPattern
 }
 
-GroupGraphPattern {
-  '{' ( SubSelect | GroupGraphPatternSub ) '}'
+Aggregate {
+  ( COUNT '(' DISTINCT? ( '*' | Expression ) ')'
+  | SUM '(' DISTINCT? Expression ')'
+  | MIN '(' DISTINCT? Expression ')'
+  | MAX '(' DISTINCT? Expression ')'
+  | AVG '(' DISTINCT? Expression ')'
+  | SAMPLE '(' DISTINCT? Expression ')'
+  | GROUP_CONCAT '(' DISTINCT? Expression ( ';' SEPARATOR '=' String )? ')' )
 }
 
-SubSelect {
-  SelectClause WhereClause SolutionModifier ValuesClause
+IriOrFunction {
+  Iri ArgList?
 }
 
-WhereClause {
-  WHERE? GroupGraphPattern
-}
-
-SolutionModifier {
-  GroupClause? HavingClause? OrderClause? LimitOffsetClauses?
-}
-
-GroupClause {
-  GROUP BY GroupCondition+
-}
-
-GroupCondition {
-  ( BuiltInCall | FunctionCall | '(' Expression ( AS Var )? ')' | Var )
-}
-
-FunctionCall {
-  Iri ArgList
-}
-
-ArgList {
-  ( Nil | '(' DISTINCT? Expression ( ',' Expression )* ')' )
-}
-
-HavingClause {
-  HAVING HavingCondition+
-}
-
-HavingCondition {
-  Constraint
-}
-
-Constraint {
-  ( BrackettedExpression | BuiltInCall | FunctionCall )
-}
-
-OrderClause {
-  ORDER BY OrderCondition+
-}
-
-OrderCondition {
-  ( ( ASC | DESC ) BrackettedExpression ) | ( Constraint | Var )
-}
-
-LimitOffsetClauses {
-  ( LimitClause OffsetClause? | OffsetClause LimitClause? )
-}
-
-LimitClause {
-  LIMIT Integer+
-}
-
-OffsetClause {
-  OFFSET Integer+
-}
-
-ValuesClause {
-  ( VALUES DataBlock )?
-}
-
-DataBlock {
- ( InlineDataOneVar | InlineDataFull )
-}
-
-InlineDataOneVar {
-  Var '{' DataBlockValue* '}'
-}
-
-InlineDataFull {
-  ( Nil | '(' Var* ')' ) '{' ( '(' DataBlockValue* ')' | Nil )* '}'
-}
-
-DataBlockValue {
- ( Iri | RDFLiteral | NumericLiteral | BooleanLiteral | UNDEF )
-}
 
 RDFLiteral {
-  String ( Langstag | ( '^^' Iri ) )?
+  String ( Langtag | ( '^^' Iri ) )?
 }
 
 NumericLiteral {
@@ -363,272 +613,27 @@ BooleanLiteral {
   ( TRUE | FALSE )
 }
 
-GroupGraphPatternSub {
-  TriplesBlock? ( GraphPatternNotTriples '.'? TriplesBlock? )*
+String {
+  stringLiteral1 |
+  stringLiteral2 |
+  stringLiteralLong1 |
+  stringLiteralLong2
 }
 
-TriplesBlock {
-  TriplesSameSubjectPath ( '.' TriplesBlock? )?
+Iri {
+  IriRef | PrefixedName
 }
 
-TriplesSameSubjectPath {
-  VarOrTerm PropertyListPathNotEmpty | TriplesNodePath PropertyListPath
-}
-
-VarOrTerm {
-  ( Var | GraphTerm )
-}
-
-GraphTerm {
-  ( Iri | RDFLiteral | NumericLiteral | BooleanLiteral | BlankNode | Nil )
+PrefixedName {
+  Pname_ln | Pname_ns
 }
 
 BlankNode {
-  ( BlankNodeLabel | Anon )
+  ( Blank_node_label | Anon )
 }
-
-BlankNodeLabel {
-  "_:" BlankNodeValue?
-}
-
-PropertyListPathNotEmpty {
-  ( VerbPath | VerbSimple ) ObjectListPath ( ';' ( ( VerbPath | VerbSimple ) ObjectList )? )*
-}
-
-VerbPath {
-  Path
-}
-
-Path {
-  PathAlternative
-}
-
-PathAlternative {
-  PathSequence ( '|' PathSequence )*
-}
-
-PathSequence {
-  PathEltOrInverse ( '/' PathEltOrInverse )*
-}
-
-PathElt {
-  PathPrimary PathMod?
-}
-
-PathEltOrInverse {
-  ( PathElt | '^' PathElt )
-}
-
-PathPrimary {
- ( Iri | 'a' | '!' PathNegatedPropertySet | '(' Path ')' )
-}
-
-PathNegatedPropertySet {
-  ( PathOneInPropertySet | '(' ( PathOneInPropertySet ( '|' PathOneInPropertySet )* )? ')' )
-}
-
-PathOneInPropertySet {
- ( Iri | 'a' | '^' ( Iri | 'a' ) )
-}
-
-PathMod {
-  ( '?' | '*' | '+' )
-}
-
-VerbSimple {
-  Var
-}
-
-ObjectListPath {
-  ObjectPath ( ',' ObjectPath )*
-}
-
-ObjectPath {
-  GraphNodePath
-}
-
-GraphNodePath {
-  ( VarOrTerm | TriplesNodePath )
-}
-
-TriplesNodePath {
-  ( CollectionPath | BlankNodePropertyListPath )
-}
-
-BlankNodePropertyListPath {
-  '[' PropertyListPathNotEmpty ']'
-}
-
-Collection {
-  '(' GraphNode+ ')'
-}
-
-CollectionPath {
-  '(' GraphNodePath+ ')'
-}
-
-ObjectList {
-  Object ( ',' Object )* 
-}
-
-Object {
-  GraphNode
-}
-
-GraphNode {
-  ( VarOrTerm | TriplesNode )
-}
-
-TriplesNode {
-  ( Collection | BlankNodePropertyList )
-}
-
-BlankNodePropertyList {
-  '[' PropertyListNotEmpty ']'
-}
-
-PropertyListNotEmpty {
-  Verb ObjectList ( ';' ( Verb ObjectList )? )*
-}
-
-Verb {
-  ( VarOrIri | 'a' )
-}
-
-VarOrIri {
- ( Var | Iri )
-}
-
-PropertyListPath {
-  PropertyListPathNotEmpty?
-}
-
-GraphPatternNotTriples {
-	( GroupOrUnionGraphPattern | OptionalGraphPattern | MinusGraphPattern | GraphGraphPattern | ServiceGraphPattern | Filter | Bind | InlineData )
-}
-
-GroupOrUnionGraphPattern {
-  GroupGraphPattern ( UNION GroupGraphPattern )*
-}
-
-OptionalGraphPattern {
-  OPTIONAL GroupGraphPattern
-}
-
-MinusGraphPattern {
-  MINUS GroupGraphPattern
-}
-
-GraphGraphPattern {
-  GRAPH VarOrIri GroupGraphPattern
-}
-
-ServiceGraphPattern {
-  SERVICE SILENT? VarOrIri GroupGraphPattern
-}
-
-Filter {
-  FILTER Constraint
-}
-
-Bind {
-  BIND '(' Expression AS Var ')'
-}
-
-InlineData {
-  VALUES DataBlock
-}
-
-iriOrFunction {
-  Iri ArgList?
-}
-
-DatasetClause {
-  FROM ( DefaultGraphClause | NamedGraphClause )
-}
-
-DefaultGraphClause {
-  SourceSelector
-}
-
-NamedGraphClause {
-  NAMED SourceSelector
-}
-
-SourceSelector {
-  Iri
-}
-
-ConstructQuery {
-  CONSTRUCT ( ConstructTemplate DatasetClause* WhereClause SolutionModifier | DatasetClause* WHERE '{' TriplesTemplate? '}' SolutionModifier )
-}
-
-ConstructTemplate {
-  '{' ConstructTriples? '}'
-}
-
-ConstructTriples {
-  TriplesSameSubject ( '.' ConstructTriples? )?
-}
-
-TriplesSameSubject {
-  VarOrTerm PropertyListNotEmpty | TriplesNode PropertyList
-}
-
-PropertyList {
-  PropertyListNotEmpty?
-}
-
-TriplesTemplate {
-  TriplesSameSubject ( '.' TriplesTemplate? )?
-}
-
-DescribeQuery {
-  DESCRIBE ( VarOrIri+ | '*' ) DatasetClause* WhereClause? SolutionModifier
-}
-
-AskQuery {
-  ASK DatasetClause* WhereClause SolutionModifier
-}
-
-GraphRefAll {
-  ( GraphRef | DEFAULT | NAMED | ALL )
-}
-
-GraphOrDefault {
-  DEFAULT | GRAPH? Iri
-}
-
-QuadData {
-  '{' Quads '}'
-}
-
-Quads {
-  TriplesTemplate? ( QuadsNotTriples '.'? TriplesTemplate? )*
-}
-
-QuadsNotTriples {
-  GRAPH VarOrIri '{' TriplesTemplate? '}'
-}
-
-QuadPattern {
-  '{' Quads '}'
-}
-
-DeleteClause {
-  DELETE QuadPattern
-}
-
-InsertClause {
-  INSERT QuadPattern
-}
-
-UsingClause {
-  USING ( Iri | NAMED Iri )
-}
-
 
 @skip { space | Comment* }
+
 
 @tokens {
   space { 
@@ -636,104 +641,49 @@ UsingClause {
   }
 
   Comment { 
-    "#" ![\n]* 
+    '#'+  ![\n]* "\n"? ('#'+ ![\n]* "\n")*
   }
+
   Keyword {
     $[_a-zA-Z\u00A1-\u00ff]+
   }
-
+  
   IriRef {
-    "<" (![<>"{}|^`\\\x00-\x20])* ">"
+    '<' (![<>"{}|^`\\\u{0000}-\u{0020}] | $[])* '>'
   }
 
-  Namespace {
-    PnPrefix* ":"
+  Pname_ns {
+     Pn_prefix? ':' 
   }
 
-  PnPrefix {
-    $[a-z] | $[A-Z]
+  Pname_ln {
+    Pname_ns Pn_local
+  }
+
+  @precedence {
+    Pname_ln, Pname_ns, Blank_node_label, Keyword, 'a', space
+  }
+
+  Blank_node_label {
+    '_:' ( Pn_chars_u | $[0-9] ) ( ( Pn_chars | '.' )* Pn_chars )?
   }
 
   Var {
     $[?$] VarName
   }
 
-  VarName {
-    ( pn_chars_u | $[0-9] ) ( pn_chars_u | $[0-9] | $[\u00B7] | $[\u0300-\u036F] | $[\u203F-\u2040] )*
+  @precedence {
+    Var "?" 
   }
 
-  pn_chars_u {
-    ( pn_chars_base | '_' )
-  }
-
-  pn_chars_base {
-    $[A-Z] | $[a-z]
-  }
-
-  stringLiteral1 {
-    "'" (![\x27\x5C\x0A\x0D] | Echar)* "'"
-  }
-  
-  stringLiteral2 {
-    "\"" (![\x22\x5C\x0A\x0D] | Echar)* "\""
-  }
-  
-  stringLiteralLong1 {
-    "'''" (("'" | "''")? (!['\\] | Echar))* "'''"
-  }
-  
-  stringLiteralLong2 {
-    "\"\"\"" (("\"" | "\"\"")? (!["\\] | Echar))* "\"\"\""
-  }
-
-  Echar {
-    "\\\\" $[tbnrf\\"']
-  }
-
-  Nil {
-    "(" ("\\x20" | "\\x09" | "\\x0D" | "\\x0A")* ")"
-  }
-
-  Iri {
-    IriRef | PrefixedName
-  }
-
-  PrefixedName {
-    PnameLn | Namespace
-  }
-
-  PnameLn {
-    Namespace PnLocal
-  }
-
-  PnLocal {
-    (pn_chars_u | "\\:" | $[0-9] | plx ) ((pn_chars | '.' | ':' | plx)* (pn_chars | ':' | plx) )?
-  }
-
-  plx {
-    (percent | pn_local_esc)
-  }
-
-  percent {
-    "%" hex hex
-  }
-
-  hex {
-    $[0-9] | $[A-F] | $[a-f]
-  }
-  
-  pn_local_esc {
-    "\\"
-  }
-
-  pn_chars {
-    ( pn_chars_u | '-' | $[0-9] | $[\u00B7] | $[\u0300-\u036F] | $[\u203F-\u2040] )
+  Langtag {
+    '@' $[a-zA-Z]+ ('-' $[a-zA-Z0-9]+)*
   }
 
   Integer {
     @digit+
   }
-
+  
   Decimal {
     @digit* "." @digit+
   }
@@ -741,7 +691,6 @@ UsingClause {
   Double {
     @digit+ "." @digit* Exponent | "." (@digit)+ Exponent | (@digit)+ Exponent
   }
-
 
   IntegerPositive {
     "+" Integer
@@ -767,38 +716,92 @@ UsingClause {
     "-" Double
   }
 
+  @precedence {
+    DoublePositive, DecimalPositive, IntegerPositive, Double, Decimal, Integer, "+", "."
+  }
+
+  @precedence {
+    DoubleNegative, DecimalNegative, IntegerNegative, Double, Decimal, Integer, "-", "."
+  }
+
   Exponent {
     $[eE] $[+-]? @digit+
   }
 
-  Langstag {
-    "@" @asciiLetter+ ("-" ( @asciiLowercase | @asciiUppercase | @digit)+)*
+  stringLiteral1 {
+    '\'' ( ![\r\n\'] | Echar )* '\''
+  }
+  
+  stringLiteral2 {
+    '"' ( ![\r\n\"] | Echar )* '"'
   }
 
-  BlankNodeValue {
-   ( $[A-Z] | $[a-z] | $[\u00C0-\u00D6] | $[\u00D8-\u00F6] | $[\u00F8-\u02FF] | $[\u0370-\u037D] | $[\u037F-\u1FFF] | $[\u200C-\u200D] | $[\u2070-\u218F] | $[\u2C00-\u2FEF] | $[\u3001-\uD7FF] | $[\uF900-\uFDCF] | $[\uFDF0-\uFFFD] | "_" | $[0-9] )+
+  stringLiteralLong1 {    
+    "'''" (("'" | "''")? (!['] | Echar ))* "'''"
+  }
+                             
+  stringLiteralLong2 {
+    '"""' (('"' | '""')? (!["] | Echar ))* '"""'
+  }
+                             
+  Echar {
+    '\\' $[tbnrf\"\'\\]
+  }
+           
+  Nil {
+    '(' Ws* ')'
+  }
+
+  Ws {
+    $[\u{0020}] | $[\u{0009}] | $[\u{000D}] | $[\u{000A}]
   }
 
   Anon {
-    "[" ("\\x20" | "\\x09" | "\\x0D" | "\\x0A")* "]"
+    '[' Ws* ']'
   }
 
-  @precedence { Iri, "a" , "_:", space, Keyword,  BlankNodeValue }
-  @precedence {
-    DoublePositive, DecimalPositive, IntegerPositive, Double, Decimal, Integer, "+", ".", BlankNodeValue
+  Pn_chars_base {
+    $[A-Z] | $[a-z] | $[\u{00C0}-\u{00D6}] | $[\u{00D8}-\u{00F6}] | $[\u{00F8}-\u{02FF}] | $[\u{0370}-\u{037D}] | $[\u{037F}-\u{1FFF}] | $[\u{200C}-\u{200D}] | $[\u{2070}-\u{218F}] | $[\u{2C00}-\u{2FEF}] | $[\u{3001}-\u{D7FF}] | $[\u{F900}-\u{FDCF}] | $[\u{FDF0}-\u{FFFD}] | $[\u{10000}-\u{EFFFF}]
   }
 
-  @precedence {
-    DoubleNegative, DecimalNegative, IntegerNegative, Double, Decimal, Integer, "-", ".", BlankNodeValue
+  Pn_chars_u {
+    Pn_chars_base | '_'
+  }  
+
+  VarName {
+   ( Pn_chars_u | $[0-9] ) ( Pn_chars_u | $[0-9] | $[\u{00B7}] | $[\u{0300}-\u{036F}] | $[\u{203F}-\u{2040}] )* 
   }
 
-  @precedence {
-    Var "?" 
+  Pn_chars {
+    Pn_chars_u | '-' | $[0-9] | $[\u{00B7}] | $[\u{0300}-\u{036F}] | $[\u{203F}-\u{2040}]
   }
 
-  "_:" "{" "}" "." "," ";"
+  Pn_prefix {
+    Pn_chars_base ((Pn_chars | '.')* Pn_chars)?
+  }
+
+  Pn_local {
+    (Pn_chars_u | ':' | $[0-9] | Plx) ((Pn_chars | '.' | ':' | Plx)* (Pn_chars | ':' | Plx))?
+  }
+
+  Plx {
+    Percent | Pn_local_esc
+  }
+
+  Percent	{
+    '%' Hex Hex
+  }
+
+  Hex {
+    $[0-9] | $[A-F] | $[a-f]
+  }
+
+  Pn_local_esc {
+    '\\' ('_' | '~' | '.' | '-' | '!' | '$' | '&' | "'" | '(' | ')' | '*' | '+' | ',' | ';' | '=' | '/' | '?' | '#' | '@' | '%')
+  }
+  
+  ";" "^^" "." "_:" "," "[" "]"
 }
-
 
 @external specialize { Keyword } caseInsensitive from "./tokens" {
   BASE, PREFIX, SELECT, CONSTRUCT, DESCRIBE, WHERE, DISTINCT, REDUCED, STR, LANG, LANGMATCHES, DATATYPE, ASK, BOUND, IRI, URI, BNODE, RAND, ABS, CEIL, FLOOR, ROUND, CONCAT, STRLEN, UCASE, LCASE,
@@ -809,4 +812,3 @@ UsingClause {
   REGEX, EXISTS, NOT, IN, GROUP, BY, HAVING, ORDER, ASC, DESC, LIMIT, OFFSET, VALUES, UNDEF,
   UNION, OPTIONAL, MINUS, GRAPH, SERVICE, SILENT, FILTER, BIND, AS, FROM, NAMED, TRUE, FALSE, LOAD, INTO, TO, CLEAR, DROP, CREATE, ADD, MOVE, COPY, INSERT, DATA, DELETE, WITH, DEFAULT, ALL, USING
 }
-
