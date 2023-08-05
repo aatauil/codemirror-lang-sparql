@@ -12,7 +12,7 @@ Unit(
     Prologue(
       PrefixDecl(
         PREFIX
-        Namespace,
+        Pname_ns,
         IriRef
       )
     )
