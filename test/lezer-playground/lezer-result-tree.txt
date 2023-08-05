@@ -1,0 +1,54 @@
+Unit [tree="fresh"]<0,105> {
+  Query<0,105> {
+    Prologue<0,57> {
+      PrefixDecl<0,57> {
+        PREFIX [style="keyword"]<0,6>
+        Pname_ns<7,11>
+        IriRef [style="namespace"]<12,57>
+      }
+    }
+    SelectQuery<58,105> {
+      SelectClause<58,66> {
+        SELECT [style="keyword"]<58,64>
+      }
+      WhereClause<67,96> {
+        WHERE [style="keyword"]<67,72>
+        GroupGraphPattern<73,96> {
+          GroupGraphPatternSub<77,94> {
+            TriplesBlock<77,94> {
+              TriplesSameSubjectPath<77,92> {
+                VarOrTerm<77,81> {
+                  Var [style="variableName"]<77,81>
+                }
+                PropertyListPathNotEmpty<82,92> {
+                  VerbSimple<82,87> {
+                    Var [style="variableName"]<82,87>
+                  }
+                  ObjectListPath<88,92> {
+                    ObjectPath<88,92> {
+                      GraphNodePath<88,92> {
+                        VarOrTerm<88,92> {
+                          Var [style="variableName"]<88,92>
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              "."<93,94>
+            }
+          }
+        }
+      }
+      SolutionModifier<97,105> {
+        LimitOffsetClauses<97,105> {
+          LimitClause<97,105> {
+            LIMIT [style="keyword"]<97,102>
+            Integer [style="integer"]<103,105>
+          }
+        }
+      }
+    }
+    ValuesClause<105,105>
+  }
+}
