@@ -4,9 +4,6 @@
 
 A CodeMirror extension that provides SPARQL syntax highlighting and language support.
 
-## Note
-This parser is in a usable state but not 100% in line with the spec **yet**
-
 ### Usage
 
 ```ts
