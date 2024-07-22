@@ -305,7 +305,7 @@ PropertyListNotEmpty {
 }
 
 Verb {
-  ( VarOrIri | 'a' )
+  ( VarOrIri | A_predicate )
 }
 
 ObjectList {
@@ -369,7 +369,7 @@ PathMod {
 }
 
 PathPrimary {
- ( Iri | 'a' | '!' PathNegatedPropertySet | '(' Path ')' )
+ ( Iri | A_predicate | '!' PathNegatedPropertySet | '(' Path ')' )
 }
 
 PathNegatedPropertySet {
@@ -377,7 +377,7 @@ PathNegatedPropertySet {
 }
 
 PathOneInPropertySet {
- ( Iri | 'a' | '^' ( Iri | 'a' ) )
+ ( Iri | A_predicate | '^' ( Iri | A_predicate ) )
 }
 
 TriplesNode {
@@ -632,6 +632,10 @@ BlankNode {
   ( Blank_node_label | Anon )
 }
 
+A_predicate {
+  @specialize<Keyword, 'a'>
+}
+
 @skip { space | Comment* }
 
 
@@ -661,7 +665,7 @@ BlankNode {
   }
 
   @precedence {
-    Pname_ln, Pname_ns, Blank_node_label, Keyword, 'a', space
+    Pname_ln, Pname_ns, Blank_node_label, Keyword, space
   }
 
   Blank_node_label {
