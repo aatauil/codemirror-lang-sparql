@@ -5,7 +5,8 @@
   "scripts": {
     "build": "lezer-generator src/syntax.grammar -o src/parser && rollup -c",
     "build-debug": "lezer-generator src/syntax.grammar --names -o src/parser && rollup -c",
-    "test": "mocha test/test.js"
+    "test": "mocha test/test.js",
+    "release": "release-it"
   },
   "type": "module",
   "main": "dist/index.cjs",
@@ -30,10 +31,10 @@
   "devDependencies": {
     "@lezer/generator": "^1.0.0",
     "mocha": "^9.0.1",
+    "release-it": "^17.10.0",
     "rollup": "^2.60.2",
     "rollup-plugin-dts": "^4.0.1",
     "rollup-plugin-ts": "^3.0.2",
     "typescript": "^4.3.4"
   }
-
 }
