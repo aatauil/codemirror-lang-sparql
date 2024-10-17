@@ -305,7 +305,7 @@ PropertyListNotEmpty {
 }
 
 Verb {
-  ( VarOrIri | A_predicate )
+  ( VarOrIri | 'a' )
 }
 
 ObjectList {
@@ -369,7 +369,7 @@ PathMod {
 }
 
 PathPrimary {
- ( Iri | A_predicate | '!' PathNegatedPropertySet | '(' Path ')' )
+ ( Iri | 'a' | '!' PathNegatedPropertySet | '(' Path ')' )
 }
 
 PathNegatedPropertySet {
@@ -377,7 +377,7 @@ PathNegatedPropertySet {
 }
 
 PathOneInPropertySet {
- ( Iri | A_predicate | '^' ( Iri | A_predicate ) )
+ ( Iri | 'a' | '^' ( Iri | 'a' ) )
 }
 
 TriplesNode {
@@ -632,10 +632,6 @@ BlankNode {
   ( Blank_node_label | Anon )
 }
 
-A_predicate {
-  @specialize<Keyword, 'a'>
-}
-
 @skip { space | Comment* }
 
 
@@ -665,7 +661,7 @@ A_predicate {
   }
 
   @precedence {
-    Pname_ln, Pname_ns, Blank_node_label, Keyword, space
+    Pname_ln, Pname_ns, Blank_node_label, Keyword, 'a', space
   }
 
   Blank_node_label {
@@ -807,7 +803,7 @@ A_predicate {
   ";" "^^" "." "_:" "," "[" "]"
 }
 
-@external specialize { Keyword } caseInsensitive from "./tokens" {
+@external specialize { Keyword } caseInsensitive from "./highlight" {
   BASE, PREFIX, SELECT, CONSTRUCT, DESCRIBE, WHERE, DISTINCT, REDUCED, STR, LANG, LANGMATCHES, DATATYPE, ASK, BOUND, IRI, URI, BNODE, RAND, ABS, CEIL, FLOOR, ROUND, CONCAT, STRLEN, UCASE, LCASE,
   ENCODE_FOR_URI, CONTAINS, STRSTARTS, STRENDS, STRBEFORE, STRAFTER, YEAR, MONTH, DAY, 
   HOURS, MINUTES, SECONDS, TIMEZONE, TZ, NOW, UUID, STRUUID, MD5, SHA1, SHA256, SHA384, 
@@ -816,3 +812,7 @@ A_predicate {
   REGEX, EXISTS, NOT, IN, GROUP, BY, HAVING, ORDER, ASC, DESC, LIMIT, OFFSET, VALUES, UNDEF,
   UNION, OPTIONAL, MINUS, GRAPH, SERVICE, SILENT, FILTER, BIND, AS, FROM, NAMED, TRUE, FALSE, LOAD, INTO, TO, CLEAR, DROP, CREATE, ADD, MOVE, COPY, INSERT, DATA, DELETE, WITH, DEFAULT, ALL, USING
 }
+
+
+
+@external propSource highlight from "./highlight"
