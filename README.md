@@ -4,7 +4,7 @@
 
 A CodeMirror extension that provides SPARQL syntax highlighting and language support.
 
-### Usage
+## Usage
 
 ```ts
 import { basicSetup } from 'codemirror';
@@ -28,11 +28,11 @@ new EditorView({
 });
 ```
 
-### Developing the Grammar
+## Developing the Grammar
 
 To develop and test the SPARQL grammar, you can use the [Lezer Playground](https://lezer-playground.vercel.app/). The Lezer Playground is an online tool that allows you to write and test Lezer grammars interactively. Here's how you can use it:
 
-1. **Access the Playground**: Open the [Lezer Playground](https://lezer.codemirror.net/) in your web browser.
+1. **Access the Playground**: Open the [Lezer Playground](https://lezer-playground.vercel.app/) in your web browser.
 
 2. **Load the Grammar**: Copy the contents of your `lezer-grammar.txt` file and paste it into the grammar editor section of the playground.
 
@@ -49,6 +49,6 @@ Note: if it fails to build run `npm run build-debug` this will include terms in 
 
 8. **Run Tests**: Execute `npm run test` to run all test cases and verify that everything is functioning correctly. Ensure all tests pass before finalizing your changes.
 
-### SPARQL Grammar Definition
+## SPARQL Grammar Definition
 
 The SPARQL grammar used in this CodeMirror extension is developed based on the official SPARQL 1.1 grammar definition provided by the W3C. You can find the detailed grammar specification in the [SPARQL 1.1 Query Language](https://www.w3.org/TR/sparql11-query/#sparqlGrammar) document. This specification serves as the foundation for parsing and understanding SPARQL queries, ensuring that the language support provided by this extension aligns with the standards set by the W3C.
