@@ -52,3 +52,7 @@ Note: if it fails to build run `npm run build-debug` this will include terms in 
 ## SPARQL Grammar Definition
 
 The SPARQL grammar used in this CodeMirror extension is developed based on the official SPARQL 1.1 grammar definition provided by the W3C. You can find the detailed grammar specification in the [SPARQL 1.1 Query Language](https://www.w3.org/TR/sparql11-query/#sparqlGrammar) document. This specification serves as the foundation for parsing and understanding SPARQL queries, ensuring that the language support provided by this extension aligns with the standards set by the W3C.
+
+## SPARQL Editor
+
+Need a ready to use editor with SPARQL support including: syntax highlighting, tooltips, search and more? Visit the [sparql-editor](https://github.com/aatauil/sparql-editor)
