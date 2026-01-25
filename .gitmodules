@@ -1,0 +1,3 @@
+[submodule "sparql-query"]
+	path = sparql-query
+	url = https://github.com/w3c/sparql-query.git
