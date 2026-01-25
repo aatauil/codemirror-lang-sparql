@@ -8,8 +8,12 @@ Query {
   Prologue ( SelectQuery | ConstructQuery | DescribeQuery | AskQuery ) ValuesClause    
 }
 
-Prologue { 
-  ( BaseDecl | PrefixDecl )*
+Prologue {
+  ( VersionDecl | BaseDecl | PrefixDecl )*
+}
+
+VersionDecl {
+  VERSION String
 }
 
 BaseDecl {
@@ -253,7 +257,7 @@ InlineDataFull {
 }
 
 DataBlockValue {
- Iri | RDFLiteral | NumericLiteral | BooleanLiteral | UNDEF
+ Iri | RDFLiteral | NumericLiteral | BooleanLiteral | UNDEF | TripleTermData
 }
 
 MinusGraphPattern {
@@ -293,7 +297,7 @@ ConstructTriples {
 }
 
 TriplesSameSubject {
-  VarOrTerm PropertyListNotEmpty | TriplesNode PropertyList
+  VarOrTerm PropertyListNotEmpty | TriplesNode PropertyList | ReifiedTripleBlock
 }
 
 PropertyList {
@@ -313,11 +317,11 @@ ObjectList {
 }
 
 Object {
-  GraphNode
+  GraphNode Annotation
 }
 
 TriplesSameSubjectPath {
-  VarOrTerm PropertyListPathNotEmpty | TriplesNodePath PropertyListPath
+  VarOrTerm PropertyListPathNotEmpty | TriplesNodePath PropertyListPath | ReifiedTripleBlockPath
 }
 
 PropertyListPath {
@@ -341,7 +345,7 @@ ObjectListPath {
 }
 
 ObjectPath {
-  GraphNodePath
+  GraphNodePath AnnotationPath
 }
 
 Path {
@@ -405,15 +409,15 @@ CollectionPath {
 }
 
 GraphNode {
-  ( VarOrTerm | TriplesNode )
+  ( VarOrTerm | TriplesNode | ReifiedTriple )
 }
 
 GraphNodePath {
-  ( VarOrTerm | TriplesNodePath )
+  ( VarOrTerm | TriplesNodePath | ReifiedTriple )
 }
 
 VarOrTerm {
-  ( Var | GraphTerm )
+  ( Var | GraphTerm | TripleTerm )
 }
 
 VarOrIri {
@@ -422,6 +426,86 @@ VarOrIri {
 
 GraphTerm {
   ( Iri | RDFLiteral | NumericLiteral | BooleanLiteral | BlankNode | Nil )
+}
+
+TripleTerm {
+  '<<(' ttSubject Verb ttObject ')>>'
+}
+
+ttSubject {
+  Var | Iri | RDFLiteral | NumericLiteral | BooleanLiteral | BlankNode | TripleTerm
+}
+
+ttObject {
+  Var | Iri | RDFLiteral | NumericLiteral | BooleanLiteral | BlankNode | TripleTerm
+}
+
+TripleTermData {
+  '<<(' ttDataSubject ( Iri | A_predicate ) ttDataObject ')>>'
+}
+
+ttDataSubject {
+  Iri
+}
+
+ttDataObject {
+  Iri | RDFLiteral | NumericLiteral | BooleanLiteral | TripleTermData
+}
+
+ReifiedTriple {
+  '<<' rtSubject Verb rtObject Reifier? '>>'
+}
+
+rtSubject {
+  Var | Iri | RDFLiteral | NumericLiteral | BooleanLiteral | BlankNode | ReifiedTriple | TripleTerm
+}
+
+rtObject {
+  Var | Iri | RDFLiteral | NumericLiteral | BooleanLiteral | BlankNode | ReifiedTriple | TripleTerm
+}
+
+Reifier {
+  '~' VarOrReifierId?
+}
+
+VarOrReifierId {
+  Var | Iri | BlankNode
+}
+
+ReifiedTripleBlock {
+  ReifiedTriple PropertyList
+}
+
+ReifiedTripleBlockPath {
+  ReifiedTriple PropertyListPath
+}
+
+Annotation {
+  ( Reifier | AnnotationBlock )*
+}
+
+AnnotationBlock {
+  '{|' PropertyListNotEmpty '|}'
+}
+
+AnnotationPath {
+  ( Reifier | AnnotationBlockPath )*
+}
+
+AnnotationBlockPath {
+  '{|' PropertyListPathNotEmpty '|}'
+}
+
+ExprTripleTerm {
+  '<<(' exprTTSubject Verb exprTTObject ')>>'
+}
+
+exprTTSubject {
+  Iri | Var
+}
+
+exprTTObject {
+  Iri | RDFLiteral | NumericLiteral | BooleanLiteral | Var | ExprTripleTerm
 }
 
 Expression {
@@ -474,21 +558,22 @@ MultiplicativeExpression {
 }
 
 UnaryExpression {
-    '!' PrimaryExpression
-  | '+' PrimaryExpression
-  | '-' PrimaryExpression
+    '!' UnaryExpression
+  | '+' UnaryExpression
+  | '-' UnaryExpression
   | PrimaryExpression
 }
 
 PrimaryExpression {
   (
-   BrackettedExpression | 
-   BuiltInCall | 
-   IriOrFunction | 
-   RDFLiteral | 
-   NumericLiteral | 
-   BooleanLiteral | 
-   Var
+   BrackettedExpression |
+   BuiltInCall |
+   IriOrFunction |
+   RDFLiteral |
+   NumericLiteral |
+   BooleanLiteral |
+   Var |
+   ExprTripleTerm
   )
 }
 
@@ -551,7 +636,16 @@ BuiltInCall {
   | ISNUMERIC '(' Expression ')'
   | RegexExpression
   | ExistsFunc
-  | NotExistsFunc )
+  | NotExistsFunc
+  | LANGDIR '(' Expression ')'
+  | HASLANG '(' Expression ')'
+  | HASLANGDIR '(' Expression ')'
+  | ISTRIPLE '(' Expression ')'
+  | TRIPLE '(' Expression ',' Expression ',' Expression ')'
+  | SUBJECT '(' Expression ')'
+  | PREDICATE '(' Expression ')'
+  | OBJECT '(' Expression ')'
+  | STRLANGDIR '(' Expression ',' Expression ',' Expression ')' )
 }
 
 RegexExpression {
@@ -681,7 +775,7 @@ A_predicate {
   }
 
   Langtag {
-    '@' $[a-zA-Z]+ ('-' $[a-zA-Z0-9]+)*
+    '@' $[a-zA-Z]+ ('-' $[a-zA-Z0-9]+)* ('--' $[a-zA-Z]+)?
   }
 
   Integer {
@@ -749,7 +843,7 @@ A_predicate {
   }
                              
   Echar {
-    '\\' $[tbnrf\"\'\\]
+    '\\' ($[tbnrf\"\'\\] | 'u' Hex Hex Hex Hex | 'U' Hex Hex Hex Hex Hex Hex Hex Hex)
   }
            
   Nil {
@@ -804,15 +898,24 @@ A_predicate {
     '\\' ('_' | '~' | '.' | '-' | '!' | '$' | '&' | "'" | '(' | ')' | '*' | '+' | ',' | ';' | '=' | '/' | '?' | '#' | '@' | '%')
   }
   
+  "<<" ">>" "<<(" ")>>" "{|" "|}" "~"
   ";" "^^" "." "_:" "," "[" "]"
+
+  @precedence {
+    "<<(", "<<", "<"
+  }
+  @precedence {
+    ")>>", ">>", ">"
+  }
 }
 
 @external specialize { Keyword } caseInsensitive from "./tokens" {
   BASE, PREFIX, SELECT, CONSTRUCT, DESCRIBE, WHERE, DISTINCT, REDUCED, STR, LANG, LANGMATCHES, DATATYPE, ASK, BOUND, IRI, URI, BNODE, RAND, ABS, CEIL, FLOOR, ROUND, CONCAT, STRLEN, UCASE, LCASE,
-  ENCODE_FOR_URI, CONTAINS, STRSTARTS, STRENDS, STRBEFORE, STRAFTER, YEAR, MONTH, DAY, 
-  HOURS, MINUTES, SECONDS, TIMEZONE, TZ, NOW, UUID, STRUUID, MD5, SHA1, SHA256, SHA384, 
-  SHA512, COALESCE, IF, STRLANG, STRDT, SAMETERM, ISIRI, ISURI, ISBLANK, ISLITERAL, 
+  ENCODE_FOR_URI, CONTAINS, STRSTARTS, STRENDS, STRBEFORE, STRAFTER, YEAR, MONTH, DAY,
+  HOURS, MINUTES, SECONDS, TIMEZONE, TZ, NOW, UUID, STRUUID, MD5, SHA1, SHA256, SHA384,
+  SHA512, COALESCE, IF, STRLANG, STRDT, SAMETERM, ISIRI, ISURI, ISBLANK, ISLITERAL,
   ISNUMERIC, COUNT, SUM, MIN, MAX, AVG, SAMPLE, GROUP_CONCAT, SEPARATOR, SUBSTR, REPLACE,
   REGEX, EXISTS, NOT, IN, GROUP, BY, HAVING, ORDER, ASC, DESC, LIMIT, OFFSET, VALUES, UNDEF,
-  UNION, OPTIONAL, MINUS, GRAPH, SERVICE, SILENT, FILTER, BIND, AS, FROM, NAMED, TRUE, FALSE, LOAD, INTO, TO, CLEAR, DROP, CREATE, ADD, MOVE, COPY, INSERT, DATA, DELETE, WITH, DEFAULT, ALL, USING
+  UNION, OPTIONAL, MINUS, GRAPH, SERVICE, SILENT, FILTER, BIND, AS, FROM, NAMED, TRUE, FALSE, LOAD, INTO, TO, CLEAR, DROP, CREATE, ADD, MOVE, COPY, INSERT, DATA, DELETE, WITH, DEFAULT, ALL, USING,
+  VERSION, LANGDIR, HASLANG, HASLANGDIR, ISTRIPLE, TRIPLE, SUBJECT, PREDICATE, OBJECT, STRLANGDIR
 }
