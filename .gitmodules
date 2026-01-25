@@ -1,3 +1,9 @@
 [submodule "sparql-query"]
 	path = sparql-query
 	url = https://github.com/w3c/sparql-query.git
+[submodule "rdf-tests"]
+	path = rdf-tests
+	url = https://github.com/w3c/rdf-tests.git
+[submodule ".claude/skills"]
+	path = .claude/skills
+	url = https://github.com/rybesh/skills.git
