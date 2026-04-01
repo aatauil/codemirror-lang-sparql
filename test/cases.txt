@@ -122,15 +122,15 @@ Unit(
 
 # example from demo
 
-SELECT DISTINCT ?painter ?painterLabel (count (DISTINCT ?exhibition) as ?exhibition_count) 
+SELECT DISTINCT ?painter ?painterLabel (count (DISTINCT ?exhibition) as ?exhibition_count)
 (group_concat(DISTINCT ?exhibitionLabel; separator=", ") as ?exhibitions)
 WHERE {
   ?painter wdt:P106 wd:Q1028181 . #give me all people with occupation (P106) painter (Q1028181)
-  ?painter wdt:P135 wd:Q40415 . #who belonged to the impressionist (Q40415) movement (P135)  
+  ?painter wdt:P135 wd:Q40415 . #who belonged to the impressionist (Q40415) movement (P135)
   ?painting wdt:P170  ?painter . #the paintings created by (P170) the painter
   ?painting wdt:P608 ?exhibition . #have an exhibition history (P608) at an exhibition
   ?exhibition rdfs:label ?exhibitionLabel . #give me the english Labels of these exhibitions, if possible
-  FILTER (lang(?exhibitionLabel) = "en") 
+  FILTER (lang(?exhibitionLabel) = "en")
 
   SERVICE wikibase:label {bd:serviceParam wikibase:language "en".}
 } GROUP BY ?painter ?painterLabel
@@ -138,3 +138,348 @@ WHERE {
 ==>
 
 Unit(Query(Prologue,SelectQuery(SelectClause(SELECT,DISTINCT,Var,Var,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(BuiltInCall(Aggregate(COUNT,DISTINCT,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var)))))))))))))))))))))),AS,Var,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(BuiltInCall(Aggregate(GROUP_CONCAT,DISTINCT,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var)))))))))),";",SEPARATOR,String)))))))))))),AS,Var),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(PrefixedName(Pname_ln))))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(Iri(PrefixedName(Pname_ln))))))))),".",Comment,TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(PrefixedName(Pname_ln))))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(Iri(PrefixedName(Pname_ln))))))))),".",Comment,TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(PrefixedName(Pname_ln))))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))),".",Comment,TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(PrefixedName(Pname_ln))))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))),".",Comment,TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(PrefixedName(Pname_ln))))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))),"."))))),Comment,GraphPatternNotTriples(Filter(FILTER,Constraint(BrackettedExpression(Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(BuiltInCall(LANG,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var)))))))))))))))),NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(RDFLiteral(String))))))))))))))),GraphPatternNotTriples(ServiceGraphPattern(SERVICE,VarOrIri(Iri(PrefixedName(Pname_ln))),GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(GraphTerm(Iri(PrefixedName(Pname_ln)))),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(PrefixedName(Pname_ln))))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(RDFLiteral(String)))))))),".")))))))),SolutionModifier(GroupClause(GROUP,BY,GroupCondition(Var),GroupCondition(Var)))),ValuesClause))
+
+# ASK query
+
+ASK { ?s a ?type }
+
+==>
+
+Unit(Query(Prologue,AskQuery(ASK,WhereClause(GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(A_predicate))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# CONSTRUCT query
+
+CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }
+
+==>
+
+Unit(Query(Prologue,ConstructQuery(CONSTRUCT,ConstructTemplate(ConstructTriples(TriplesSameSubject(VarOrTerm(Var),PropertyListNotEmpty(Verb(VarOrIri(Var)),ObjectList(Object(GraphNode(VarOrTerm(Var)))))))),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# DESCRIBE query
+
+DESCRIBE <http://example.org/>
+
+==>
+
+Unit(Query(Prologue,DescribeQuery(DESCRIBE,VarOrIri(Iri(IriRef)),SolutionModifier),ValuesClause))
+
+# BASE declaration
+
+BASE <http://example.org/> SELECT * WHERE { ?s ?p ?o }
+
+==>
+
+Unit(Query(Prologue(BaseDecl(BASE,IriRef)),SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# SELECT DISTINCT
+
+SELECT DISTINCT ?s WHERE { ?s ?p ?o }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT,DISTINCT,Var),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# OPTIONAL pattern
+
+SELECT * WHERE { ?s ?p ?o . OPTIONAL { ?s <http://www.w3.org/2000/01/rdf-schema#label> ?l } }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))),"."),GraphPatternNotTriples(OptionalGraphPattern(OPTIONAL,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))))))),SolutionModifier),ValuesClause))
+
+# UNION pattern
+
+SELECT * WHERE { { ?s a <http://ex.org/A> } UNION { ?s a <http://ex.org/B> } }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(GraphPatternNotTriples(GroupOrUnionGraphPattern(GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(A_predicate))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(Iri(IriRef))))))))))),UNION,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(A_predicate))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(Iri(IriRef)))))))))))))))),SolutionModifier),ValuesClause))
+
+# MINUS pattern
+
+SELECT * WHERE { ?s a <http://ex.org/X> . MINUS { ?s <http://ex.org/excluded> ?o } }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(A_predicate))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(Iri(IriRef)))))))),"."),GraphPatternNotTriples(MinusGraphPattern(MINUS,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))))))),SolutionModifier),ValuesClause))
+
+# FILTER REGEX
+
+SELECT * WHERE { ?s <http://ex.org/name> ?name . FILTER(REGEX(?name, "pattern", "i")) }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))),"."),GraphPatternNotTriples(Filter(FILTER,Constraint(BrackettedExpression(Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(BuiltInCall(RegexExpression(REGEX,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var)))))))))),",",Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(RDFLiteral(String))))))))))),",",Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(RDFLiteral(String)))))))))))))))))))))))))))))),SolutionModifier),ValuesClause))
+
+# FILTER NOT EXISTS
+
+SELECT * WHERE { ?s ?p ?o . FILTER NOT EXISTS { ?s <http://ex.org/p> ?o } }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))),"."),GraphPatternNotTriples(Filter(FILTER,Constraint(BuiltInCall(NotExistsFunc(NOT,EXISTS,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var))))))))))))))))),SolutionModifier),ValuesClause))
+
+# BIND clause
+
+SELECT * WHERE { ?s <http://ex.org/firstName> ?fn . BIND(CONCAT(?fn, "!") AS ?result) }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))),"."),GraphPatternNotTriples(Bind(BIND,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(BuiltInCall(CONCAT,ExpressionList(Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var)))))))))),",",Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(RDFLiteral(String))))))))))))))))))))))),AS,Var))))),SolutionModifier),ValuesClause))
+
+# VALUES single variable
+
+SELECT * WHERE { VALUES ?x { 1 2 3 } ?x ?p ?o }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(GraphPatternNotTriples(InlineData(VALUES,DataBlock(InlineDataOneVar(Var,DataBlockValue(NumericLiteral(NumericLiteralUnsigned(Integer))),DataBlockValue(NumericLiteral(NumericLiteralUnsigned(Integer))),DataBlockValue(NumericLiteral(NumericLiteralUnsigned(Integer))))))),TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# VALUES multi-variable
+
+SELECT * WHERE { VALUES (?x ?y) { (1 "a") (2 "b") } }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(GraphPatternNotTriples(InlineData(VALUES,DataBlock(InlineDataFull(Var,Var,DataBlockValue(NumericLiteral(NumericLiteralUnsigned(Integer))),DataBlockValue(RDFLiteral(String)),DataBlockValue(NumericLiteral(NumericLiteralUnsigned(Integer))),DataBlockValue(RDFLiteral(String))))))))),SolutionModifier),ValuesClause))
+
+# GRAPH pattern
+
+SELECT * WHERE { GRAPH <http://ex.org/g> { ?s ?p ?o } }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(GraphPatternNotTriples(GraphGraphPattern(GRAPH,VarOrIri(Iri(IriRef)),GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))))))),SolutionModifier),ValuesClause))
+
+# SERVICE pattern
+
+SELECT * WHERE { SERVICE <http://ex.org/sparql> { ?s ?p ?o } }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(GraphPatternNotTriples(ServiceGraphPattern(SERVICE,VarOrIri(Iri(IriRef)),GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))))))),SolutionModifier),ValuesClause))
+
+# subquery
+
+SELECT * WHERE { SELECT ?s WHERE { ?s ?p ?o } }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(SubSelect(SelectClause(SELECT,Var),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier,ValuesClause))),SolutionModifier),ValuesClause))
+
+# inverse path
+
+SELECT * WHERE { ?s ^<http://ex.org/knows> ?o }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# zero-or-more path
+
+SELECT * WHERE { ?s <http://ex.org/knows>* ?o }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)),PathMod)))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# one-or-more path
+
+SELECT * WHERE { ?s <http://ex.org/knows>+ ?o }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)),PathMod)))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# optional path
+
+SELECT * WHERE { ?s <http://ex.org/knows>? ?o }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)),PathMod)))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# negated path
+
+SELECT * WHERE { ?s !<http://ex.org/knows> ?o }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(PathNegatedPropertySet(PathOneInPropertySet(Iri(IriRef)))))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# path alternation
+
+SELECT * WHERE { ?s (<http://ex.org/knows>|<http://ex.org/likes>) ?o }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef))))),PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# RDF literal with language tag
+
+SELECT * WHERE { ?s ?p "bonjour"@fr }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(RDFLiteral(String,Langtag)))))))))))),SolutionModifier),ValuesClause))
+
+# RDF literal with datatype
+
+SELECT * WHERE { ?s ?p "42"^^<http://www.w3.org/2001/XMLSchema#integer> }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(RDFLiteral(String,"^^",Iri(IriRef))))))))))))),SolutionModifier),ValuesClause))
+
+# long string literal
+
+SELECT * WHERE { ?s ?p """multi
+line""" }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(RDFLiteral(String)))))))))))),SolutionModifier),ValuesClause))
+
+# blank node label
+
+SELECT * WHERE { _:b0 <http://ex.org/name> "Alice" }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(GraphTerm(BlankNode(Blank_node_label))),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(RDFLiteral(String)))))))))))),SolutionModifier),ValuesClause))
+
+# blank node property list
+
+SELECT * WHERE { [ <http://ex.org/name> "Alice" ] <http://ex.org/p> ?o }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(TriplesNodePath(BlankNodePropertyListPath("[",PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(RDFLiteral(String))))))),"]")),PropertyListPath(PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var))))))))))),SolutionModifier),ValuesClause))
+
+# decimal literal
+
+SELECT * WHERE { ?s ?p 3.14 }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(NumericLiteral(NumericLiteralUnsigned(Decimal))))))))))))),SolutionModifier),ValuesClause))
+
+# double literal
+
+SELECT * WHERE { ?s ?p 1.5e10 }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(GraphTerm(NumericLiteral(NumericLiteralUnsigned(Double))))))))))))),SolutionModifier),ValuesClause))
+
+# HAVING clause
+
+SELECT ?x (COUNT(?o) AS ?cnt) WHERE { ?x ?p ?o } GROUP BY ?x HAVING (COUNT(?o) > 1)
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT,Var,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(BuiltInCall(Aggregate(COUNT,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var)))))))))))))))))))))),AS,Var),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier(GroupClause(GROUP,BY,GroupCondition(Var)),HavingClause(HAVING,HavingCondition(Constraint(BrackettedExpression(Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(BuiltInCall(Aggregate(COUNT,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var))))))))))))))))),NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(NumericLiteral(NumericLiteralUnsigned(Integer)))))))))))))))))),ValuesClause))
+
+# ORDER BY DESC
+
+SELECT * WHERE { ?s ?p ?o } ORDER BY DESC(?o)
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier(OrderClause(ORDER,BY,OrderCondition(DESC,BrackettedExpression(Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var))))))))))))))),ValuesClause))
+
+# LIMIT and OFFSET
+
+SELECT * WHERE { ?s ?p ?o } LIMIT 10 OFFSET 5
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier(LimitOffsetClauses(LimitClause(LIMIT,Integer),OffsetClause(OFFSET,Integer)))),ValuesClause))
+
+# aggregate SUM
+
+SELECT (SUM(?x) AS ?total) WHERE { ?s <http://ex.org/p> ?x }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(BuiltInCall(Aggregate(SUM,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var)))))))))))))))))))))),AS,Var),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# aggregate AVG
+
+SELECT (AVG(?x) AS ?avg) WHERE { ?s <http://ex.org/p> ?x }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(BuiltInCall(Aggregate(AVG,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var)))))))))))))))))))))),AS,Var),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# aggregate MIN and MAX
+
+SELECT (MIN(?x) AS ?min) (MAX(?x) AS ?max) WHERE { ?s <http://ex.org/p> ?x }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(BuiltInCall(Aggregate(MIN,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var)))))))))))))))))))))),AS,Var,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(BuiltInCall(Aggregate(MAX,Expression(ConditionalOrExpression(ConditionalAndExpression(ValueLogical(RelationalExpression(NumericExpression(AdditiveExpression(MultiplicativeExpression(UnaryExpression(PrimaryExpression(Var)))))))))))))))))))))),AS,Var),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# FROM named graph
+
+SELECT * FROM <http://ex.org/g> WHERE { ?s ?p ?o }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),DatasetClause(FROM,DefaultGraphClause(SourceSelector(Iri(IriRef)))),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# FROM NAMED
+
+SELECT * FROM NAMED <http://ex.org/g> WHERE { ?s ?p ?o }
+
+==>
+
+Unit(Query(Prologue,SelectQuery(SelectClause(SELECT),DatasetClause(FROM,NamedGraphClause(NAMED,SourceSelector(Iri(IriRef)))),WhereClause(WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbSimple(Var),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))),SolutionModifier),ValuesClause))
+
+# INSERT DATA
+
+INSERT DATA { <http://ex.org/s> <http://ex.org/p> <http://ex.org/o> }
+
+==>
+
+Unit(Update(Prologue,Update1(InsertData(INSERT,DATA,QuadData(Quads(TriplesTemplate(TriplesSameSubject(VarOrTerm(GraphTerm(Iri(IriRef))),PropertyListNotEmpty(Verb(VarOrIri(Iri(IriRef))),ObjectList(Object(GraphNode(VarOrTerm(GraphTerm(Iri(IriRef)))))))))))))))
+
+# DELETE DATA
+
+DELETE DATA { <http://ex.org/s> <http://ex.org/p> <http://ex.org/o> }
+
+==>
+
+Unit(Update(Prologue,Update1(DeleteData(DELETE,DATA,QuadData(Quads(TriplesTemplate(TriplesSameSubject(VarOrTerm(GraphTerm(Iri(IriRef))),PropertyListNotEmpty(Verb(VarOrIri(Iri(IriRef))),ObjectList(Object(GraphNode(VarOrTerm(GraphTerm(Iri(IriRef)))))))))))))))
+
+# DELETE INSERT WHERE
+
+DELETE { ?s <http://ex.org/p> ?o } INSERT { ?s <http://ex.org/p> "new" } WHERE { ?s <http://ex.org/p> ?o }
+
+==>
+
+Unit(Update(Prologue,Update1(Modify(DeleteClause(DELETE,QuadPattern(Quads(TriplesTemplate(TriplesSameSubject(VarOrTerm(Var),PropertyListNotEmpty(Verb(VarOrIri(Iri(IriRef))),ObjectList(Object(GraphNode(VarOrTerm(Var)))))))))),InsertClause(INSERT,QuadPattern(Quads(TriplesTemplate(TriplesSameSubject(VarOrTerm(Var),PropertyListNotEmpty(Verb(VarOrIri(Iri(IriRef))),ObjectList(Object(GraphNode(VarOrTerm(GraphTerm(RDFLiteral(String)))))))))))),WHERE,GroupGraphPattern(GroupGraphPatternSub(TriplesBlock(TriplesSameSubjectPath(VarOrTerm(Var),PropertyListPathNotEmpty(VerbPath(Path(PathAlternative(PathSequence(PathEltOrInverse(PathElt(PathPrimary(Iri(IriRef)))))))),ObjectListPath(ObjectPath(GraphNodePath(VarOrTerm(Var)))))))))))))
+
+# LOAD
+
+LOAD <http://ex.org/g>
+
+==>
+
+Unit(Update(Prologue,Update1(Load(LOAD,Iri(IriRef)))))
+
+# CLEAR GRAPH
+
+CLEAR GRAPH <http://ex.org/g>
+
+==>
+
+Unit(Update(Prologue,Update1(Clear(CLEAR,GraphRefAll(GraphRef(GRAPH,Iri(IriRef)))))))
+
+# CREATE GRAPH
+
+CREATE GRAPH <http://ex.org/g>
+
+==>
+
+Unit(Update(Prologue,Update1(Create(CREATE,GraphRef(GRAPH,Iri(IriRef))))))
