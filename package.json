@@ -24,9 +24,9 @@
     "url": "https://github.com/aatauil/codemirror-lang-sparql.git"
   },
   "dependencies": {
-    "@codemirror/language": "^6.0.0",
-    "@lezer/highlight": "^1.0.0",
-    "@lezer/lr": "^1.0.0"
+    "@codemirror/language": "^6.12.3",
+    "@lezer/highlight": "^1.2.3",
+    "@lezer/lr": "^1.4.8"
   },
   "devDependencies": {
     "@lezer/generator": "^1.8.0",
