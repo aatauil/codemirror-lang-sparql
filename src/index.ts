@@ -1,6 +1,7 @@
 import { parser } from "./syntax.grammar"
 import { LRLanguage, LanguageSupport, foldNodeProp, foldInside } from "@codemirror/language"
 import { styleTags, tags as t } from "@lezer/highlight"
+import { SyntaxNode } from "@lezer/common"
 
 export const SparqlLanguage = LRLanguage.define({
   parser: parser.configure({
@@ -34,10 +35,11 @@ export const SparqlLanguage = LRLanguage.define({
         "Iri": t.url,
         "RDFLiteral/Iri": t.typeName,
       }),
-      foldNodeProp.add({ 
+      foldNodeProp.add({
         GroupGraphPattern: foldInside,
         QuadData: foldInside,
-        Prologue(tree) { return { from: tree.from + 7, to: tree.to - 0} }
+        // +7 skips the leading keyword ("PREFIX " or "BASE   ") so the fold starts after it
+        Prologue(tree: SyntaxNode) { return { from: tree.from + 7, to: tree.to } }
       }),
     ]
   }),
