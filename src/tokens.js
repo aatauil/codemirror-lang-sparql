@@ -1,10 +1,17 @@
 import * as tokens from "./parser.terms.js"
 
 /**
- * Keywords are matched in a case-insensitive manner with the exception
- * of the keyword 'a' which, in line with Turtle and N3, is used in place
- * of the IRI rdf:type (in full, http://www.w3.org/1999/02/22-rdf-syntax-ns#type).
+ * Case-insensitive keyword matcher for use as a Lezer @external specialize handler.
+ *
+ * SPARQL keywords are case-insensitive per the spec, with one exception: the
+ * shorthand predicate 'a' (representing rdf:type) is case-sensitive and must
+ * remain lowercase to avoid colliding with uppercase keyword matching.
+ *
+ * @param {string} value - The token text to look up
+ * @param {Object} _stack - Lezer parse stack (required by the external specialize
+ *   signature but not used here)
+ * @returns {number} The term ID for the keyword, or -1 if not found
  */
-export const caseInsensitive = (value, stack) => {
+export const caseInsensitive = (value, _stack) => {
   return tokens[value.toUpperCase()] || -1;
 };
