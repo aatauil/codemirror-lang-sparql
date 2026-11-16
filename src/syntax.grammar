@@ -5,10 +5,10 @@
 }
 
 Query {
-  Prologue ( SelectQuery | ConstructQuery | DescribeQuery | AskQuery ) ValuesClause    
+  Prologue ( SelectQuery | ConstructQuery | DescribeQuery | AskQuery ) ValuesClause
 }
 
-Prologue { 
+Prologue {
   ( BaseDecl | PrefixDecl )*
 }
 
@@ -309,7 +309,7 @@ Verb {
 }
 
 ObjectList {
-  Object ( ',' Object )* 
+  Object ( ',' Object )*
 }
 
 Object {
@@ -425,7 +425,7 @@ GraphTerm {
 }
 
 Expression {
-  ConditionalOrExpression 
+  ConditionalOrExpression
 }
 
 ConditionalOrExpression {
@@ -441,15 +441,15 @@ ValueLogical {
 }
 
 RelationalExpression {
-  NumericExpression ( 
-    '=' NumericExpression | 
-    '!=' NumericExpression | 
-    '<' NumericExpression | 
-    '>' NumericExpression | 
-    '<=' NumericExpression | 
-    '>=' NumericExpression | 
-    IN ExpressionList | 
-    NOT IN ExpressionList 
+  NumericExpression (
+    '=' NumericExpression |
+    '!=' NumericExpression |
+    '<' NumericExpression |
+    '>' NumericExpression |
+    '<=' NumericExpression |
+    '>=' NumericExpression |
+    IN ExpressionList |
+    NOT IN ExpressionList
   )?
 }
 
@@ -458,14 +458,14 @@ NumericExpression {
 }
 
 AdditiveExpression {
-  MultiplicativeExpression ( 
-    '+' MultiplicativeExpression | 
-    '-' MultiplicativeExpression | 
-    ( NumericLiteralPositive |  NumericLiteralNegative ) 
-    ( 
-      ( '*' UnaryExpression ) | 
-      ( '/' UnaryExpression ) 
-    )* 
+  MultiplicativeExpression (
+    '+' MultiplicativeExpression |
+    '-' MultiplicativeExpression |
+    ( NumericLiteralPositive |  NumericLiteralNegative )
+    (
+      ( '*' UnaryExpression ) |
+      ( '/' UnaryExpression )
+    )*
   )*
 }
 
@@ -482,12 +482,12 @@ UnaryExpression {
 
 PrimaryExpression {
   (
-   BrackettedExpression | 
-   BuiltInCall | 
-   IriOrFunction | 
-   RDFLiteral | 
-   NumericLiteral | 
-   BooleanLiteral | 
+   BrackettedExpression |
+   BuiltInCall |
+   IriOrFunction |
+   RDFLiteral |
+   NumericLiteral |
+   BooleanLiteral |
    Var
   )
 }
@@ -640,24 +640,24 @@ A_predicate {
 
 
 @tokens {
-  space { 
-    @whitespace+ 
+  space {
+    @whitespace+
   }
 
-  Comment { 
+  Comment {
     '#'+  ![\n]* "\n"? ('#'+ ![\n]* "\n")*
   }
 
   Keyword {
     $[_a-zA-Z\u00A1-\u00ff]+
   }
-  
+
   IriRef {
     '<' (![<>"{}|^`\\\u{0000}-\u{0020}] | $[])* '>'
   }
 
   Pname_ns {
-     Pn_prefix? ':' 
+     Pn_prefix? ':'
   }
 
   Pname_ln {
@@ -677,7 +677,7 @@ A_predicate {
   }
 
   @precedence {
-    Var "?" 
+    Var "?"
   }
 
   Langtag {
@@ -687,7 +687,7 @@ A_predicate {
   Integer {
     @digit+
   }
-  
+
   Decimal {
     @digit* "." @digit+
   }
@@ -735,23 +735,23 @@ A_predicate {
   stringLiteral1 {
     '\'' ( ![\r\n\'] | Echar )* '\''
   }
-  
+
   stringLiteral2 {
     '"' ( ![\r\n\"] | Echar )* '"'
   }
 
-  stringLiteralLong1 {    
+  stringLiteralLong1 {
     "'''" (("'" | "''")? (!['] | Echar ))* "'''"
   }
-                             
+
   stringLiteralLong2 {
     '"""' (('"' | '""')? (!["] | Echar ))* '"""'
   }
-                             
+
   Echar {
     '\\' $[tbnrf\"\'\\]
   }
-           
+
   Nil {
     '(' Ws* ')'
   }
@@ -770,10 +770,10 @@ A_predicate {
 
   Pn_chars_u {
     Pn_chars_base | '_'
-  }  
+  }
 
   VarName {
-   ( Pn_chars_u | $[0-9] ) ( Pn_chars_u | $[0-9] | $[\u{00B7}] | $[\u{0300}-\u{036F}] | $[\u{203F}-\u{2040}] )* 
+   ( Pn_chars_u | $[0-9] ) ( Pn_chars_u | $[0-9] | $[\u{00B7}] | $[\u{0300}-\u{036F}] | $[\u{203F}-\u{2040}] )*
   }
 
   Pn_chars {
@@ -803,15 +803,15 @@ A_predicate {
   Pn_local_esc {
     '\\' ('_' | '~' | '.' | '-' | '!' | '$' | '&' | "'" | '(' | ')' | '*' | '+' | ',' | ';' | '=' | '/' | '?' | '#' | '@' | '%')
   }
-  
-  ";" "^^" "." "_:" "," "[" "]"
+
+  ";" "^^" "." "_:" "," "[" "]" "(" ")" "{" "}"
 }
 
 @external specialize { Keyword } caseInsensitive from "./tokens" {
   BASE, PREFIX, SELECT, CONSTRUCT, DESCRIBE, WHERE, DISTINCT, REDUCED, STR, LANG, LANGMATCHES, DATATYPE, ASK, BOUND, IRI, URI, BNODE, RAND, ABS, CEIL, FLOOR, ROUND, CONCAT, STRLEN, UCASE, LCASE,
-  ENCODE_FOR_URI, CONTAINS, STRSTARTS, STRENDS, STRBEFORE, STRAFTER, YEAR, MONTH, DAY, 
-  HOURS, MINUTES, SECONDS, TIMEZONE, TZ, NOW, UUID, STRUUID, MD5, SHA1, SHA256, SHA384, 
-  SHA512, COALESCE, IF, STRLANG, STRDT, SAMETERM, ISIRI, ISURI, ISBLANK, ISLITERAL, 
+  ENCODE_FOR_URI, CONTAINS, STRSTARTS, STRENDS, STRBEFORE, STRAFTER, YEAR, MONTH, DAY,
+  HOURS, MINUTES, SECONDS, TIMEZONE, TZ, NOW, UUID, STRUUID, MD5, SHA1, SHA256, SHA384,
+  SHA512, COALESCE, IF, STRLANG, STRDT, SAMETERM, ISIRI, ISURI, ISBLANK, ISLITERAL,
   ISNUMERIC, COUNT, SUM, MIN, MAX, AVG, SAMPLE, GROUP_CONCAT, SEPARATOR, SUBSTR, REPLACE,
   REGEX, EXISTS, NOT, IN, GROUP, BY, HAVING, ORDER, ASC, DESC, LIMIT, OFFSET, VALUES, UNDEF,
   UNION, OPTIONAL, MINUS, GRAPH, SERVICE, SILENT, FILTER, BIND, AS, FROM, NAMED, TRUE, FALSE, LOAD, INTO, TO, CLEAR, DROP, CREATE, ADD, MOVE, COPY, INSERT, DATA, DELETE, WITH, DEFAULT, ALL, USING
